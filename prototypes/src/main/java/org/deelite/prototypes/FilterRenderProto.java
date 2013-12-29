@@ -47,9 +47,11 @@ import org.opengis.filter.Filter;
 public class FilterRenderProto {
 
     public FilterRenderProto() throws Exception {
+        File projectFolder = new File(".");
+        File dataFolder = new File(projectFolder, "testdata");
 
-        String imageFolder = "/media/FATBOTTOMED/Dropbox/hydrologis/lavori/2014_ian_mayo/";
-        String vesselPath = "/media/FATBOTTOMED/Dropbox/hydrologis/lavori/2014_ian_mayo/boat1.rep";
+        String imageFolder = dataFolder.getAbsolutePath();
+        String vesselPath = dataFolder + File.separator + "boat1.rep";
         int imageWidth = 2400;
         int imageHeight = 1200;
 
