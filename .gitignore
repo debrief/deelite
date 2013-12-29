@@ -1,0 +1,10 @@
+syntax: regexp
+
+.classpath
+.project
+.settings
+target
+
+~$
+.swp$
+.class$
