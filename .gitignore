@@ -1,9 +1,7 @@
 syntax: regexp
 
-.classpath
-.project
-.settings
 target
+bin
 
 ~$
 .swp$
