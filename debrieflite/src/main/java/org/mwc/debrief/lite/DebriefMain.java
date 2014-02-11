@@ -37,6 +37,8 @@ import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.Track;
 import org.mwc.debrief.lite.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.InformationDelegator;
 import com.bbn.openmap.LayerHandler;
@@ -51,12 +53,13 @@ import com.bbn.openmap.tools.drawing.OMDrawingTool;
 public class DebriefMain extends AbstractMain {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(DebriefMain.class);
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		 
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -67,7 +70,7 @@ public class DebriefMain extends AbstractMain {
 					frame.setLocationRelativeTo(null);
 					
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("DebriefMain", e);
 				}
 			}
 		});
@@ -97,10 +100,6 @@ public class DebriefMain extends AbstractMain {
         OMMouseMode mouseMode = new OMMouseMode();
         mouseMode.setInfoDelegator(informationDelegator);
         
-//        DistanceMouseMode distanceMouseMode = new DistanceMouseMode();
-//        distanceMouseMode.setInfoDelegator(informationDelegator);
-//        map.addMapComponent(distanceMouseMode);
-//        
         MouseDelegator mouseDelegator = new MouseDelegator();
         map.addMapComponent(mouseDelegator);
         map.addMapComponent(mouseMode);
@@ -120,25 +119,8 @@ public class DebriefMain extends AbstractMain {
         informationDelegator.setLightTriggers(true);
         
 		TrackLayer trackLayer = createTrackLayer("/data/boat_file.rep", map);
-        
-        map.addMapComponent(trackLayer);
-          		
-//        EditorLayer distanceLayer = new EditorLayer();
-//        Properties props = new Properties();
-//        props.put("distlayer.prettyName", "Distance Layer");
-//        props.put("distlayer.showAttributes","false");
-//        props.put("distlayer.editor","com.bbn.openmap.layer.editor.DrawingEditorTool");
-//        props.put("distlayer.loaders","distance");
-//        props.put("distlayer.distance.class","com.bbn.openmap.tools.drawing.OMDistanceLoader");
-//        props.put("distlayer.distance.attributesClass","com.bbn.openmap.omGraphics.DrawingAttributes");
-//        props.put("distlayer.distance.lineColor","FFAA0000");
-//        props.put("distlayer.distance.mattingColor","66333333");
-//        props.put("distlayer.distance.matted","true");
-//        distanceLayer.setProperties("distlayer", props);
-//        map.addMapComponent(distanceLayer);
-
+        map.addMapComponent(trackLayer);          		
         zoomSupport.add(mapBean);
-        
         plotPanel.add(map);
 	}
 

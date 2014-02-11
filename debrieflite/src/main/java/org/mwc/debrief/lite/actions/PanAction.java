@@ -24,6 +24,9 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.bbn.openmap.MouseDelegator;
 import com.bbn.openmap.event.OMMouseMode;
 import com.bbn.openmap.gui.OverlayMapPanel;
@@ -36,6 +39,7 @@ import com.bbn.openmap.gui.OverlayMapPanel;
 public class PanAction extends AbstractDebriefAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(PanAction.class);
 	private OverlayMapPanel map;
 
 	public PanAction() {
@@ -54,7 +58,7 @@ public class PanAction extends AbstractDebriefAction {
 				delegator.setActiveMouseModeWithID(OMMouseMode.modeID);
 			}
 		} else {
-			System.out.println("Invalid map");
+			logger.info("Invalid map");
 		}
 	}
 

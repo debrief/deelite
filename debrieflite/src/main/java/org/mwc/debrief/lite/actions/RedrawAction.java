@@ -24,6 +24,9 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author snpe
@@ -32,6 +35,7 @@ import java.awt.event.KeyEvent;
 public class RedrawAction extends AbstractDebriefAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(RedrawAction.class);
 
 	public RedrawAction() {
 		super("Redraw", "Redraw (Alt+9)", "repaint.gif", KeyEvent.VK_9);
@@ -39,7 +43,7 @@ public class RedrawAction extends AbstractDebriefAction {
 	
 	public void actionPerformed(ActionEvent e) {
 		// TODO
-		System.out.println("Redraw");
+		logger.info("Redraw");
 	}
 
 }

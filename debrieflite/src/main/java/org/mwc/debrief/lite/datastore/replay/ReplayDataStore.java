@@ -44,6 +44,8 @@ import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Track;
 import org.mwc.debrief.lite.model.impl.TrackImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author snpe
@@ -52,6 +54,7 @@ import org.mwc.debrief.lite.model.impl.TrackImpl;
 public class ReplayDataStore implements DataStore {
 
 	private static final String COMMENT_PREFIX = ";;";
+	static final Logger logger = LoggerFactory.getLogger(ReplayDataStore.class);
 	
 	private Properties properties;
 	private boolean initialized = false;
@@ -139,6 +142,7 @@ public class ReplayDataStore implements DataStore {
 				String fileName = properties.getProperty(DataStore.FILENAME);
 				if (fileName == null || fileName.isEmpty()) {
 					valid = false;
+					logger.info("Invalid file: {}", fileName);
 					return;
 				}
 				// check type ???
@@ -155,13 +159,14 @@ public class ReplayDataStore implements DataStore {
 					}
 					if (is == null) {
 						valid = false;
+						logger.info("Invalid file: {}", fileName);
 						return;
 					}
 					readFile(is);
 				} catch (FileNotFoundException e) {
 					valid = false;
 					exceptions.add(e);
-					e.printStackTrace();
+					logger.info("File: {}\n{}", fileName, e);
 				} finally {
 					if (is != null) {
 						try {
@@ -188,7 +193,7 @@ public class ReplayDataStore implements DataStore {
 				readLine(line);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("Reading error:", e);
 			valid = false;
 			exceptions.add(e);
 		}

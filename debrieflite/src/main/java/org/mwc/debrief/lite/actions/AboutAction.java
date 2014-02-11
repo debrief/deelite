@@ -26,6 +26,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author snpe
@@ -34,6 +37,8 @@ import javax.swing.KeyStroke;
 public class AboutAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(AboutAction.class);
+	
 
 	public AboutAction() {
 		super("About");
@@ -44,7 +49,7 @@ public class AboutAction extends AbstractAction {
 	
 	public void actionPerformed(ActionEvent e) {
 		// TODO
-		System.out.println("About");
+		logger.info("About");
 	}
 
 }

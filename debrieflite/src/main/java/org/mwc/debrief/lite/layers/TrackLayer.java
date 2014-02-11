@@ -62,7 +62,9 @@ public class TrackLayer extends OMGraphicHandlerLayer {
 			list = init();
 		}
 
-		list.generate(getProjection());
+		if (list != null) {
+			list.generate(getProjection());
+		}
 
 		return list;
 	}

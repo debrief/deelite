@@ -31,6 +31,9 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.bbn.openmap.InformationDelegator;
 import com.bbn.openmap.LayerHandler;
 import com.bbn.openmap.MapBean;
@@ -50,6 +53,7 @@ import com.bbn.openmap.tools.drawing.OMDrawingTool;
 public class Main extends AbstractMain {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(Main.class);
 	
 	/**
 	 * Launch the application.
@@ -66,7 +70,7 @@ public class Main extends AbstractMain {
 					frame.setLocationRelativeTo(null);
 					
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("MainTest", e);
 				}
 			}
 		});

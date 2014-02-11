@@ -32,12 +32,16 @@ import org.mwc.debrief.lite.model.impl.SpatialImpl;
 import org.mwc.debrief.lite.utils.Conversions;
 import org.mwc.debrief.lite.utils.DebriefFormatDateTime;
 import org.mwc.debrief.lite.utils.ReadingUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * import a fix from a line of text (in Replay format)
  */
 public final class ImportFix implements LineImporter {
 
+	static final Logger logger = LoggerFactory.getLogger(ImportFix.class);
+	
 	private Exception exception;
 	
 	@Override
@@ -142,7 +146,7 @@ public final class ImportFix implements LineImporter {
 			}
 			return positionFix;
 		} catch (final ParseException pe) {
-			pe.printStackTrace();
+			logger.error("Line {}\nException:\n{}", line, pe);
 			exception = pe;
 			return null;
 		}

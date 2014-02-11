@@ -59,6 +59,8 @@ import org.mwc.debrief.lite.actions.RangeBearingAction;
 import org.mwc.debrief.lite.actions.RedrawAction;
 import org.mwc.debrief.lite.actions.ZoomInAction;
 import org.mwc.debrief.lite.actions.ZoomOutAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.MapBean;
 import com.bbn.openmap.event.ZoomSupport;
@@ -74,6 +76,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final ServiceLoader<LookAndFeel> LOOK_AND_FEEL_LOADER = ServiceLoader.load(LookAndFeel.class); 
+	final static Logger logger = LoggerFactory.getLogger(AbstractMain.class);
 	
 	protected ZoomSupport zoomSupport;
 	
@@ -105,7 +108,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("L&F", e);
 		}
 	}
 
@@ -300,18 +303,8 @@ public abstract class AbstractMain extends OpenMapFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					setLookAndFeel(lafClassName);
-				} catch (ClassNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (InstantiationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (UnsupportedLookAndFeelException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (Exception e1) {
+					logger.error("L&F", e1);
 				}
 			}
 		};

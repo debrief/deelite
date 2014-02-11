@@ -31,9 +31,13 @@ import java.util.TimeZone;
 
 import org.mwc.debrief.lite.model.Temporal;
 import org.mwc.debrief.lite.model.impl.TemporalImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebriefFormatDateTime
 {
+	static final Logger logger = LoggerFactory.getLogger(DebriefFormatDateTime.class);
+	
 	private static DateFormat _dfMillis = null;
 	private static DateFormat _df = null;
 	private static NumberFormat _micros = null;
@@ -286,7 +290,7 @@ public class DebriefFormatDateTime
 			}
 			catch (final ParseException e1)
 			{
-				e1.printStackTrace();
+				logger.info("Parsing error", e1);
 			}
 
 			int micros = 0;
