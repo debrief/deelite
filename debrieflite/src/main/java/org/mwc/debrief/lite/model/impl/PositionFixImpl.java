@@ -33,10 +33,10 @@ public class PositionFixImpl implements PositionFix {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
-	private Spatial location;
-	private Temporal temporal;
-	private double speed; // in yards per second
-	private double course; // in radians
+	final private Spatial location;
+	final private Temporal temporal;
+	final private double speed; // in yards per second
+	final private double course; // in radians
 	private String symbology;
 	private String label;
 	
@@ -91,22 +91,6 @@ public class PositionFixImpl implements PositionFix {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.model.BaseElement#setSpatial(org.mwc.debrief.lite.model.Spatial)
-	 */
-	@Override
-	public void setSpatial(Spatial spatial) {
-		this.location = spatial;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.model.BaseElement#setTemporal(org.mwc.debrief.lite.model.Temporal)
-	 */
-	@Override
-	public void setTemporal(Temporal temporal) {
-		this.temporal = temporal;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.mwc.debrief.lite.model.PositionFix#getSpeed()
 	 */
 	@Override
@@ -120,22 +104,6 @@ public class PositionFixImpl implements PositionFix {
 	@Override
 	public double getCourse() {
 		return course;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.model.PositionFix#setSpeed(double)
-	 */
-	@Override
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.model.PositionFix#setCourse(double)
-	 */
-	@Override
-	public void setCourse(double course) {
-		this.course = course;
 	}
 
 	/* (non-Javadoc)

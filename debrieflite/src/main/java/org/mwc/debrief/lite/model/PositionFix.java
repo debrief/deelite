@@ -31,8 +31,6 @@ public interface PositionFix extends BaseElement {
 	double getCourse();
 	String getSymbology();
 	String getLabel();
-	void setSpeed(double speed);
-	void setCourse(double course);
 	void setSymbology(String symbology);
 	void setLabel(String label);
 }

@@ -99,6 +99,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 	private ZoomInAction zoomInAction;
 	private ZoomOutAction zoomOutAction;
 	private RangeBearingAction rangeBearingAction;
+	@SuppressWarnings("unused")
 	private RedrawAction redrawAction;
 
 	protected static void setBaseLookAndFeel() {

@@ -30,9 +30,9 @@ import org.mwc.debrief.lite.model.Spatial;
 public class SpatialImpl implements Spatial {
 
 	private static final long serialVersionUID = 1L;
-	private double longitude;
-	private double latitude;
-	private double depth;
+	private final double longitude;
+	private final double latitude;
+	private final double depth;
 
 	/**
 	 * long winded constructor, taking raw arguments note: if there are decimal
@@ -86,20 +86,14 @@ public class SpatialImpl implements Spatial {
 			theLongSec = dec * 60d;
 		}
 
-		// ok - do the store
-		this.latitude = theLatDegs + theLatMin / 60 + theLatSec / (60 * 60);
-		this.longitude = theLongDegs + theLongMin / 60 + theLongSec / (60 * 60);
+		// ok - calculat the degrees
+		double latVal = theLatDegs + theLatMin / 60 + theLatSec / (60 * 60);
+		double longVal = theLongDegs + theLongMin / 60 + theLongSec / (60 * 60);
+		
+		// and sort out the hemishere
+		this.latitude =  (""+latHem).toUpperCase().equals("S") ? -latVal : latVal;
+		this.longitude = (""+longHem).toUpperCase().equals("W") ? - longVal : longVal;
 		this.depth = theDepth;
-
-		// switch the deg vals if in -ve hemishere
-		if ((latHem == 'S') || (latHem == 's')) {
-			this.latitude = -this.latitude;
-		}
-
-		if ((longHem == 'W') || (longHem == 'w')) {
-			this.longitude = -this.longitude;
-		}
-
 	}
 
 	/*
@@ -111,17 +105,6 @@ public class SpatialImpl implements Spatial {
 	public double getLatitude() {
 		return latitude;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mwc.debrief.lite.model.Spatial#setLatitude(double)
-	 */
-	@Override
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -135,31 +118,11 @@ public class SpatialImpl implements Spatial {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.mwc.debrief.lite.model.Spatial#setLongitude(double)
-	 */
-	@Override
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.mwc.debrief.lite.model.Spatial#getDepth()
 	 */
 	@Override
 	public double getDepth() {
 		return depth;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mwc.debrief.lite.model.Spatial#setDepth(double)
-	 */
-	@Override
-	public void setDepth(double depth) {
-		this.depth = depth;
 	}
 
 	/**

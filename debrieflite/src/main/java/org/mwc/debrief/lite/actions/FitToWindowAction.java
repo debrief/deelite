@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import com.bbn.openmap.event.CenterSupport;
-import com.bbn.openmap.gui.EmbeddedNavPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
 
 /**

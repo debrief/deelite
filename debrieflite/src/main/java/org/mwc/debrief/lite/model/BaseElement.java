@@ -28,6 +28,4 @@ package org.mwc.debrief.lite.model;
 public interface BaseElement extends Named {
 	Temporal getTemporal();
 	Spatial getSpatial();
-	void setSpatial(Spatial spatial);
-	void setTemporal(Temporal temporal);
 }
