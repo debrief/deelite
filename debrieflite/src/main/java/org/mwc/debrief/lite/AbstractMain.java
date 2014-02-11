@@ -99,7 +99,6 @@ public abstract class AbstractMain extends OpenMapFrame {
 	private ZoomInAction zoomInAction;
 	private ZoomOutAction zoomOutAction;
 	private RangeBearingAction rangeBearingAction;
-	@SuppressWarnings("unused")
 	private RedrawAction redrawAction;
 
 	protected static void setBaseLookAndFeel() {
@@ -139,6 +138,8 @@ public abstract class AbstractMain extends OpenMapFrame {
 		zoomOutAction.setZoomDelegate(zoomSupport);
 		fitToWindow.setMap(map);
 		rangeBearingAction.setMap(map);
+		rangeBearingAction.setEnabled(false);
+		redrawAction.setEnabled(false);
 	}
 
 	protected List<Action> createActions() {

@@ -24,8 +24,6 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import com.bbn.openmap.MouseDelegator;
-import com.bbn.openmap.event.DistanceMouseMode;
 import com.bbn.openmap.gui.OverlayMapPanel;
 
 /**
@@ -43,19 +41,7 @@ public class RangeBearingAction extends AbstractDebriefAction {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if (map == null) {
-			return;
-		}
-		Object object = map.getMapComponentByType(MouseDelegator.class);
-		if (object instanceof MouseDelegator) {
-			MouseDelegator delegator = (MouseDelegator) object;
-			String mouseModeID = delegator.getActiveMouseModeID();
-			if (!DistanceMouseMode.modeID.equals(mouseModeID)) {
-				delegator.setActiveMouseModeWithID(DistanceMouseMode.modeID);
-			}
-		} else {
-			System.out.println("Invalid map");
-		}
+		// FIXME
 	}
 
 	/**

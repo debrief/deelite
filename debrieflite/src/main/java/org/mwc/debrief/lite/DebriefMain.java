@@ -99,10 +99,10 @@ public class DebriefMain extends AbstractMain {
         OMMouseMode mouseMode = new OMMouseMode();
         mouseMode.setInfoDelegator(informationDelegator);
         
-        DistanceMouseMode distanceMouseMode = new DistanceMouseMode();
-        distanceMouseMode.setInfoDelegator(informationDelegator);
-        map.addMapComponent(distanceMouseMode);
-        
+//        DistanceMouseMode distanceMouseMode = new DistanceMouseMode();
+//        distanceMouseMode.setInfoDelegator(informationDelegator);
+//        map.addMapComponent(distanceMouseMode);
+//        
         MouseDelegator mouseDelegator = new MouseDelegator();
         map.addMapComponent(mouseDelegator);
         map.addMapComponent(mouseMode);
@@ -125,19 +125,19 @@ public class DebriefMain extends AbstractMain {
         
         map.addMapComponent(trackLayer);
           		
-        EditorLayer distanceLayer = new EditorLayer();
-        Properties props = new Properties();
-        props.put("distlayer.prettyName", "Distance Layer");
-        props.put("distlayer.showAttributes","false");
-        props.put("distlayer.editor","com.bbn.openmap.layer.editor.DrawingEditorTool");
-        props.put("distlayer.loaders","distance");
-        props.put("distlayer.distance.class","com.bbn.openmap.tools.drawing.OMDistanceLoader");
-        props.put("distlayer.distance.attributesClass","com.bbn.openmap.omGraphics.DrawingAttributes");
-        props.put("distlayer.distance.lineColor","FFAA0000");
-        props.put("distlayer.distance.mattingColor","66333333");
-        props.put("distlayer.distance.matted","true");
-        distanceLayer.setProperties("distlayer", props);
-        map.addMapComponent(distanceLayer);
+//        EditorLayer distanceLayer = new EditorLayer();
+//        Properties props = new Properties();
+//        props.put("distlayer.prettyName", "Distance Layer");
+//        props.put("distlayer.showAttributes","false");
+//        props.put("distlayer.editor","com.bbn.openmap.layer.editor.DrawingEditorTool");
+//        props.put("distlayer.loaders","distance");
+//        props.put("distlayer.distance.class","com.bbn.openmap.tools.drawing.OMDistanceLoader");
+//        props.put("distlayer.distance.attributesClass","com.bbn.openmap.omGraphics.DrawingAttributes");
+//        props.put("distlayer.distance.lineColor","FFAA0000");
+//        props.put("distlayer.distance.mattingColor","66333333");
+//        props.put("distlayer.distance.matted","true");
+//        distanceLayer.setProperties("distlayer", props);
+//        map.addMapComponent(distanceLayer);
 
         zoomSupport.add(mapBean);
         
