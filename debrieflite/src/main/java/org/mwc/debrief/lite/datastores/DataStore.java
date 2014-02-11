@@ -19,12 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.events;
+package org.mwc.debrief.lite.datastores;
 
 import java.util.List;
+import java.util.Map;
 
-import org.mwc.debrief.lite.model.DebriefLayer;
-import org.mwc.debrief.lite.model.Narattive;
+import org.mwc.debrief.lite.model.AnnotationLayer;
+import org.mwc.debrief.lite.model.Narrative;
+import org.mwc.debrief.lite.model.Track;
 
 /**
  * @author snpe
@@ -32,7 +34,12 @@ import org.mwc.debrief.lite.model.Narattive;
  */
 public interface DataStore {
 	
-	List<Narattive> getNarattives();
-	List<DebriefLayer> getLayers();
+	public static String REPLAY_TYPE = "rep";
+	public static String TYPE = "type";
+	public static String FILENAME = "fileName";
+	
+	List<Narrative> getNarratives();
+	Map<String,Track> getTracks();
+	Map<String,AnnotationLayer> getAnnotationLayers();
 
 }

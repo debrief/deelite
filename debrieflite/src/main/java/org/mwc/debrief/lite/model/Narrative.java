@@ -21,13 +21,13 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.model;
 
+import java.util.Set;
+
 /**
  * @author snpe
  *
  */
-public interface BaseElement extends Named {
-	Temporal getTemporal();
-	Spatial getSpatial();
-	void setSpatial(Spatial spatial);
-	void setTemporal(Temporal temporal);
+public interface Narrative extends Named {
+	
+	Set<NarrativeEntry> getEntries();
 }

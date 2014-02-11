@@ -21,13 +21,13 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.events;
 
-import org.mwc.debrief.lite.model.Narattive;
+import org.mwc.debrief.lite.model.Narrative;
 
 
 /**
  * @author snpe
  *
  */
-public interface NarrativeInterface extends DebriefMessage<Narattive>{
+public interface NarrativeInterface extends DebriefMessage<Narrative>{
 	
 }

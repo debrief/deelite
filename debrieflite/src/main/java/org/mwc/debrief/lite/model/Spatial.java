@@ -44,4 +44,11 @@ public interface Spatial extends Serializable {
 	double getLongitude();
 	void setLongitude(double longitude);
 
+	/**
+	 * depth
+	 */
+	
+	double getDepth();
+	void setDepth(double depth);
+
 }

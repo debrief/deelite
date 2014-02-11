@@ -38,13 +38,20 @@ public class ZoomOutAction extends AbstractDebriefAction {
 	
 	private ZoomSupport zoomDelegate;
 
-	public ZoomOutAction(ZoomSupport zoomSupport) {
+	public ZoomOutAction() {
 		super("Zoom Out", "Zoom Out (Alt+6)", "zoomout.gif", KeyEvent.VK_6);
-		zoomDelegate = zoomSupport;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		zoomDelegate.fireZoom(ZoomEvent.RELATIVE, 2f);
+		if (zoomDelegate != null) {
+			zoomDelegate.fireZoom(ZoomEvent.RELATIVE, 2f);
+		}
 	}
 
+	/**
+	 * @param zoomDelegate the zoomDelegate to set
+	 */
+	public void setZoomDelegate(ZoomSupport zoomDelegate) {
+		this.zoomDelegate = zoomDelegate;
+	}
 }

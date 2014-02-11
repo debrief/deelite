@@ -38,13 +38,21 @@ public class ZoomInAction extends AbstractDebriefAction {
 
 	private ZoomSupport zoomDelegate;
 	
-	public ZoomInAction(ZoomSupport zoomSupport) {
+	public ZoomInAction() {
 		super("Zoom In", "Zoom In (Alt+7)", "zoomin.gif", KeyEvent.VK_7);
-		zoomDelegate = zoomSupport;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		zoomDelegate.fireZoom(ZoomEvent.RELATIVE, 0.5f);
+		if (zoomDelegate != null) {
+			zoomDelegate.fireZoom(ZoomEvent.RELATIVE, 0.5f);
+		}
+	}
+
+	/**
+	 * @param zoomDelegate the zoomDelegate to set
+	 */
+	public void setZoomDelegate(ZoomSupport zoomDelegate) {
+		this.zoomDelegate = zoomDelegate;
 	}
 
 }

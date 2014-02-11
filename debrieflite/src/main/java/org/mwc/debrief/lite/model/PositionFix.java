@@ -27,4 +27,12 @@ package org.mwc.debrief.lite.model;
  */
 public interface PositionFix extends BaseElement {
 
+	double getSpeed();
+	double getCourse();
+	String getSymbology();
+	String getLabel();
+	void setSpeed(double speed);
+	void setCourse(double course);
+	void setSymbology(String symbology);
+	void setLabel(String label);
 }

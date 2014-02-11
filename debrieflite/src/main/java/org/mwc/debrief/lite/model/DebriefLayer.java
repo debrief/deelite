@@ -21,6 +21,7 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.model;
 
+
 /**
  * @author snpe
  * 
@@ -28,5 +29,6 @@ package org.mwc.debrief.lite.model;
  *
  */
 public interface DebriefLayer extends Named {
+	
 
 }

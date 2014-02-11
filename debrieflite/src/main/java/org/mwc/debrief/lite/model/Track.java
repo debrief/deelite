@@ -21,7 +21,7 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.model;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author snpe
@@ -29,6 +29,6 @@ import java.util.Set;
  */
 public interface Track extends DebriefLayer {
 	
-	Set<Bearing> getBearings();
-	Set<PositionFix> getPositionFixes();
+	List<Bearing> getBearings();
+	List<PositionFix> getPositionFixes();
 }

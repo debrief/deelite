@@ -19,15 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.model;
+package org.mwc.debrief.lite.datastores;
 
-import java.util.Set;
+import java.util.Properties;
+
+import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
 
 /**
  * @author snpe
  *
  */
-public interface Narattive extends Named {
-	
-	Set<NarrativeEntry> getEntries();
+public class DataStoreFactory {
+
+	public static DataStore getDataStore(Properties properties) {
+		if (DataStore.REPLAY_TYPE.equals(properties.getProperty(DataStore.TYPE))) {
+			return new ReplayDataStore(properties);
+		}
+		return null;
+	}
 }

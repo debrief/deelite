@@ -19,15 +19,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.model;
+package org.mwc.debrief.lite.model.impl;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.mwc.debrief.lite.model.Bearing;
+import org.mwc.debrief.lite.model.PositionFix;
+import org.mwc.debrief.lite.model.Track;
 
 /**
  * @author snpe
  *
  */
-public interface BaseElement extends Named {
-	Temporal getTemporal();
-	Spatial getSpatial();
-	void setSpatial(Spatial spatial);
-	void setTemporal(Temporal temporal);
+public class TrackImpl implements Track {
+
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private List<PositionFix> positionFixes = new LinkedList<PositionFix>();
+	private List<Bearing> bearings = new LinkedList<Bearing>();
+	
+	public TrackImpl() {
+	}
+	/**
+	 * @param name
+	 */
+	public TrackImpl(String name) {
+		this.name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Named#getName()
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Named#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Track#getBearings()
+	 */
+	@Override
+	public List<Bearing> getBearings() {
+		return bearings;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Track#getPositionFixes()
+	 */
+	@Override
+	public List<PositionFix> getPositionFixes() {
+		return positionFixes;
+	}
+
 }

@@ -24,6 +24,10 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import com.bbn.openmap.event.CenterSupport;
+import com.bbn.openmap.gui.EmbeddedNavPanel;
+import com.bbn.openmap.gui.OverlayMapPanel;
+
 /**
  * 
  * @author snpe
@@ -32,14 +36,50 @@ import java.awt.event.KeyEvent;
 public class FitToWindowAction extends AbstractDebriefAction {
 
 	private static final long serialVersionUID = 1L;
-
+	private OverlayMapPanel map;
+	private double scale, longitude, latitude;
+	private CenterSupport centerSupport;
+	
 	public FitToWindowAction() {
 		super("Fit To Window", "Fit To Window (Alt+8)", "fit_to_win.gif", KeyEvent.VK_8);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		// TODO
-		System.out.println("Fit To Window");
+		if (map != null && scale != 0) {
+			map.getMapBean().setScale((float) scale);
+			centerSupport.fireCenter(latitude, longitude);
+		}
+	}
+
+	/**
+	 * @param tracks
+	 */
+	public void setScale(double scale) {
+		this.scale = scale;
+		
+	}
+
+	/**
+	 * @param map the map to set
+	 */
+	public void setMap(OverlayMapPanel map) {
+		this.map = map;
+		centerSupport = new CenterSupport(map.getMapBean());
+		centerSupport.add(map.getMapBean());
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	/**
+	 * @param latitude the latitude to set
+	 */
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
 	}
 
 }

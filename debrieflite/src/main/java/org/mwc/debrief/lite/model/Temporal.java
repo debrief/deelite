@@ -21,6 +21,8 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.model;
 
+import java.util.Date;
+
 /**
  * @author snpe
  *
@@ -33,6 +35,7 @@ public interface Temporal {
 	 * 
 	 * time in microsecond;
 	 */
+	long getMicros();
 	long getTime();
-	void setTime(long time);
+	Date getDate();
 }

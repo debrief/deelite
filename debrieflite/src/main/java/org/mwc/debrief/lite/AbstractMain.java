@@ -94,6 +94,12 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected OverlayMapPanel map;
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
+	protected FitToWindowAction fitToWindow;
+	private PanAction panAction;
+	private ZoomInAction zoomInAction;
+	private ZoomOutAction zoomOutAction;
+	private RangeBearingAction rangeBearingAction;
+	private RedrawAction redrawAction;
 
 	protected static void setBaseLookAndFeel() {
 		try {
@@ -116,20 +122,32 @@ public abstract class AbstractMain extends OpenMapFrame {
 		setVisible(true);
 		configurePanels();
 		zoomSupport = new ZoomSupport(this);
-		createMap();
 		actions = createActions();
+		createMap();
+		configureActions();
 		setJMenuBar(createMenuBar(actions));
 		createToolBar();
 	}
 
+	/**
+	 * 
+	 */
+	private void configureActions() {
+		panAction.setMap(map);
+		zoomInAction.setZoomDelegate(zoomSupport);
+		zoomOutAction.setZoomDelegate(zoomSupport);
+		fitToWindow.setMap(map);
+		rangeBearingAction.setMap(map);
+	}
+
 	protected List<Action> createActions() {
 		List<Action> actions = new ArrayList<Action>();
-		actions.add(new PanAction(map));
-		actions.add(new ZoomInAction(zoomSupport));
-		actions.add(new ZoomOutAction(zoomSupport));
-		actions.add(new FitToWindowAction());
-		actions.add(new RangeBearingAction(map));
-		actions.add(new RedrawAction());
+		actions.add(panAction = new PanAction());
+		actions.add(zoomInAction = new ZoomInAction());
+		actions.add(zoomOutAction = new ZoomOutAction());
+		actions.add(fitToWindow = new FitToWindowAction());
+		actions.add(rangeBearingAction = new RangeBearingAction());
+		actions.add(redrawAction = new RedrawAction());
 		return actions;
 	}
 

@@ -38,12 +38,14 @@ public class PanAction extends AbstractDebriefAction {
 	private static final long serialVersionUID = 1L;
 	private OverlayMapPanel map;
 
-	public PanAction(OverlayMapPanel map) {
+	public PanAction() {
 		super("Pan", "Pan (Alt+5)", "hand.png", KeyEvent.VK_5);
-		this.map = map;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		if (map == null) {
+			return;
+		}
 		Object object = map.getMapComponentByType(MouseDelegator.class);
 		if (object instanceof MouseDelegator) {
 			MouseDelegator delegator = (MouseDelegator) object;
@@ -54,6 +56,13 @@ public class PanAction extends AbstractDebriefAction {
 		} else {
 			System.out.println("Invalid map");
 		}
+	}
+
+	/**
+	 * @param map the map to set
+	 */
+	public void setMap(OverlayMapPanel map) {
+		this.map = map;
 	}
 
 }
