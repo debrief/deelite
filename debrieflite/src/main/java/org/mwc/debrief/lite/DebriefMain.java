@@ -43,11 +43,9 @@ import com.bbn.openmap.LayerHandler;
 import com.bbn.openmap.MapBean;
 import com.bbn.openmap.MouseDelegator;
 import com.bbn.openmap.PropertyHandler;
-import com.bbn.openmap.event.DistanceMouseMode;
 import com.bbn.openmap.event.OMMouseMode;
 import com.bbn.openmap.gui.LayersPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
-import com.bbn.openmap.layer.editor.EditorLayer;
 import com.bbn.openmap.tools.drawing.OMDrawingTool;
 
 public class DebriefMain extends AbstractMain {

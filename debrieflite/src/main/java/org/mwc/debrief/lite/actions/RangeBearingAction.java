@@ -41,6 +41,9 @@ public class RangeBearingAction extends AbstractDebriefAction {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		if (map == null) {
+			return;
+		}
 		// FIXME
 	}
 
