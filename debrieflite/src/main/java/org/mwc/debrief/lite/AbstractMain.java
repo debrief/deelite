@@ -98,11 +98,11 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
 	protected FitToWindowAction fitToWindow;
-	private PanAction panAction;
-	private ZoomInAction zoomInAction;
-	private ZoomOutAction zoomOutAction;
-	private RangeBearingAction rangeBearingAction;
-	private RedrawAction redrawAction;
+	protected PanAction panAction;
+	protected ZoomInAction zoomInAction;
+	protected ZoomOutAction zoomOutAction;
+	protected RangeBearingAction rangeBearingAction;
+	protected RedrawAction redrawAction;
 
 	protected static void setBaseLookAndFeel() {
 		try {
@@ -141,7 +141,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		zoomOutAction.setZoomDelegate(zoomSupport);
 		fitToWindow.setMap(map);
 		rangeBearingAction.setMap(map);
-		rangeBearingAction.setEnabled(false);
+		//rangeBearingAction.setEnabled(false);
 		redrawAction.setEnabled(false);
 	}
 

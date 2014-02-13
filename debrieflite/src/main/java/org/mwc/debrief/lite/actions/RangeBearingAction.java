@@ -24,7 +24,14 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bbn.openmap.MouseDelegator;
 import com.bbn.openmap.gui.OverlayMapPanel;
+import com.bbn.openmap.layer.editor.DrawingEditorTool;
+import com.bbn.openmap.layer.editor.EditorLayer;
+import com.bbn.openmap.layer.editor.EditorTool;
 
 /**
  * 
@@ -34,6 +41,7 @@ import com.bbn.openmap.gui.OverlayMapPanel;
 public class RangeBearingAction extends AbstractDebriefAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(RangeBearingAction.class);
 	private OverlayMapPanel map;
 
 	public RangeBearingAction() {
@@ -44,7 +52,24 @@ public class RangeBearingAction extends AbstractDebriefAction {
 		if (map == null) {
 			return;
 		}
-		// FIXME
+		Object object = map.getMapComponentByType(MouseDelegator.class);
+		if (object instanceof MouseDelegator) {
+			MouseDelegator delegator = (MouseDelegator) object;
+			String mouseModeID = delegator.getActiveMouseModeID();
+			if (!"Range Bearing".equals(mouseModeID)) {
+				delegator.setActiveMouseModeWithID("Range Bearing");
+			}
+			Object layerObject = map.getMapComponentByType(EditorLayer.class);
+			if (layerObject instanceof EditorLayer) {
+				EditorLayer layer = (EditorLayer) layerObject;
+				EditorTool dt = layer.getEditorTool();
+				if (dt instanceof DrawingEditorTool) {
+					((DrawingEditorTool)dt).actionPerformed(new ActionEvent(this, 0, "org.mwc.debrief.lite.graphics.DebriefDistance"));
+				}
+			}
+		} else {
+			logger.info("Invalid map");
+		}
 	}
 
 	/**

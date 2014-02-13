@@ -48,7 +48,7 @@ import com.bbn.openmap.PropertyHandler;
 import com.bbn.openmap.event.OMMouseMode;
 import com.bbn.openmap.gui.LayersPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
-import com.bbn.openmap.tools.drawing.OMDrawingTool;
+import com.bbn.openmap.layer.editor.EditorLayer;
 
 public class DebriefMain extends AbstractMain {
 
@@ -88,8 +88,6 @@ public class DebriefMain extends AbstractMain {
         map.create();
 
         mapBean = map.getMapBean(); 
-        // OMDrawingTool dt = 
-        		new OMDrawingTool();
         //mapBean.setBackgroundColor(new Color(0x99b3cc));
         LayerHandler layerHandler = new LayerHandler();
         map.addMapComponent(layerHandler);
@@ -117,6 +115,21 @@ public class DebriefMain extends AbstractMain {
         informationDelegator.setShowInfoLine(true);
         informationDelegator.setShowLights(true);
         informationDelegator.setLightTriggers(true);
+        
+        EditorLayer rangeBearingLayer = new EditorLayer();
+        Properties props = new Properties();
+        props.put("rangeBearing.prettyName", "Range Bearing");
+        props.put("rangeBearing.showAttributes","false");
+        props.put("rangeBearing.editor","com.bbn.openmap.layer.editor.DrawingEditorTool");
+        props.put("rangeBearing.loaders","rangeBearing");
+        props.put("rangeBearing.rangeBearing.class","org.mwc.debrief.lite.drawing.DebriefDistanceLoader");
+        props.put("rangeBearing.rangeBearing.attributesClass","com.bbn.openmap.omGraphics.DrawingAttributes");
+        props.put("rangeBearing.rangeBearing.lineColor","FFAA0000");
+        props.put("rangeBearing.rangeBearing.mattingColor","66333333");
+        props.put("rangeBearing.rangeBearing.matted","true");
+        rangeBearingLayer.setProperties("rangeBearing", props);
+        map.addMapComponent(rangeBearingLayer);
+        
         
 		TrackLayer trackLayer = createTrackLayer("/data/boat_file.rep", map);
         map.addMapComponent(trackLayer);          		
