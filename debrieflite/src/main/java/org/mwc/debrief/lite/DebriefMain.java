@@ -34,6 +34,7 @@ import javax.swing.border.BevelBorder;
 
 import org.mwc.debrief.lite.datastores.DataStore;
 import org.mwc.debrief.lite.datastores.DataStoreFactory;
+import org.mwc.debrief.lite.layers.RangeBearingLayer;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.Track;
 import org.mwc.debrief.lite.utils.Utils;
@@ -48,7 +49,6 @@ import com.bbn.openmap.PropertyHandler;
 import com.bbn.openmap.event.OMMouseMode;
 import com.bbn.openmap.gui.LayersPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
-import com.bbn.openmap.layer.editor.EditorLayer;
 
 public class DebriefMain extends AbstractMain {
 
@@ -89,6 +89,7 @@ public class DebriefMain extends AbstractMain {
 
         mapBean = map.getMapBean(); 
         //mapBean.setBackgroundColor(new Color(0x99b3cc));
+        //mapBean.setBackground(Color.black);
         LayerHandler layerHandler = new LayerHandler();
         map.addMapComponent(layerHandler);
         
@@ -116,7 +117,7 @@ public class DebriefMain extends AbstractMain {
         informationDelegator.setShowLights(true);
         informationDelegator.setLightTriggers(true);
         
-        EditorLayer rangeBearingLayer = new EditorLayer();
+        RangeBearingLayer rangeBearingLayer = new RangeBearingLayer();
         Properties props = new Properties();
         props.put("rangeBearing.prettyName", "Range Bearing");
         props.put("rangeBearing.showAttributes","false");
@@ -128,8 +129,8 @@ public class DebriefMain extends AbstractMain {
         props.put("rangeBearing.rangeBearing.mattingColor","66333333");
         props.put("rangeBearing.rangeBearing.matted","true");
         rangeBearingLayer.setProperties("rangeBearing", props);
+        rangeBearingLayer.findAndInit(informationDelegator);
         map.addMapComponent(rangeBearingLayer);
-        
         
 		TrackLayer trackLayer = createTrackLayer("/data/boat_file.rep", map);
         map.addMapComponent(trackLayer);          		

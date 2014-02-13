@@ -23,6 +23,9 @@ package org.mwc.debrief.lite.layers;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.RenderingHints;
+import java.awt.RenderingHints.Key;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -53,7 +56,13 @@ public class TrackLayer extends OMGraphicHandlerLayer {
 		setName("Tracks");
 		setProjectionChangePolicy(new com.bbn.openmap.layer.policy.StandardPCPolicy(
 				this, true));
-		setRenderPolicy(new BufferedImageRenderPolicy());
+		BufferedImageRenderPolicy policy = new BufferedImageRenderPolicy();
+		Map<Key, Object> map = new HashMap<RenderingHints.Key, Object>();
+		map.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
+		RenderingHints rh = new RenderingHints(map);
+		policy.setRenderingHints(rh);
+		setRenderPolicy(policy);
+		
 	}
 
 	public synchronized OMGraphicList prepare() {

@@ -24,13 +24,13 @@ package org.mwc.debrief.lite.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import org.mwc.debrief.lite.layers.RangeBearingLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.MouseDelegator;
 import com.bbn.openmap.gui.OverlayMapPanel;
 import com.bbn.openmap.layer.editor.DrawingEditorTool;
-import com.bbn.openmap.layer.editor.EditorLayer;
 import com.bbn.openmap.layer.editor.EditorTool;
 
 /**
@@ -59,9 +59,9 @@ public class RangeBearingAction extends AbstractDebriefAction {
 			if (!"Range Bearing".equals(mouseModeID)) {
 				delegator.setActiveMouseModeWithID("Range Bearing");
 			}
-			Object layerObject = map.getMapComponentByType(EditorLayer.class);
-			if (layerObject instanceof EditorLayer) {
-				EditorLayer layer = (EditorLayer) layerObject;
+			Object layerObject = map.getMapComponentByType(RangeBearingLayer.class);
+			if (layerObject instanceof RangeBearingLayer) {
+				RangeBearingLayer layer = (RangeBearingLayer) layerObject;
 				EditorTool dt = layer.getEditorTool();
 				if (dt instanceof DrawingEditorTool) {
 					((DrawingEditorTool)dt).actionPerformed(new ActionEvent(this, 0, "org.mwc.debrief.lite.graphics.DebriefDistance"));

@@ -63,7 +63,7 @@ public class DebriefDistance extends OMLine {
 	/**
 	 * Font used for labels
 	 */
-	protected Font labelFont;
+	protected Font labelFont = new Font(Font.SANS_SERIF, Font.BOLD, 12);
 	private int units;
 	private double[] rawllpts = new double[4];
 
@@ -364,5 +364,5 @@ public class DebriefDistance extends OMLine {
 	public void setStroke(Stroke s) {
 		super.setStroke(new BasicStroke(2));
 	}	
-
+	
 }
