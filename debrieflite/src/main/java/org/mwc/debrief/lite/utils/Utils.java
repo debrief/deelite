@@ -26,19 +26,21 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.swing.JOptionPane;
+
+import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.datastores.DataStore;
+import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Track;
 
 import com.bbn.openmap.Environment;
-import com.bbn.openmap.MapBean;
 import com.bbn.openmap.gui.EmbeddedNavPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
 import com.bbn.openmap.omGraphics.OMPoint;
-import com.bbn.openmap.proj.Mercator;
-import com.bbn.openmap.proj.Projection;
-import com.bbn.openmap.proj.coords.LatLonPoint;
 
 /**
  * @author snpe
@@ -97,18 +99,21 @@ public class Utils {
 			}
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			int width = (int) screenSize.getWidth();
-			int height = (int) screenSize.getHeight();
+			//int height = (int) screenSize.getHeight();
 			float scale = (float) (length*width*1000f)/2.1f;
 			
-			Projection p = new Mercator(new LatLonPoint.Double(lat, lon),
-					scale, width, height);
-			MapBean mapBean = map.getMapBean();
-			mapBean.setProjection(p);
+//			Projection p = new Mercator(new LatLonPoint.Double(lat, lon),
+//					scale, width, height);
+//			MapBean mapBean = map.getMapBean();
+//			mapBean.setProjection(p);
+			
+			map.getMapBean().setScale((float) scale);
+			DebriefMain.getCenterSupport().fireCenter(lat, lon);
 			
 			Object object = map.getMapHandler().get(EmbeddedNavPanel.class);
 			if (object instanceof EmbeddedNavPanel) {
 				EmbeddedNavPanel navPanel = (EmbeddedNavPanel) object;
-				navPanel.setRecenterPoint(mapBean.getCenter());
+				navPanel.setRecenterPoint(map.getMapBean().getCenter());
 			}
 			OMPoint center = new OMPoint(lat, lon, 3);
 			trackLayer.setCenter(center);
@@ -117,5 +122,47 @@ public class Utils {
 		}
 		return Environment.getDouble(Environment.Scale);
 	}
+
+	/**
+	 * @param map
+	 */
+	public static void removeTrackLayer(OverlayMapPanel map) {
+		TrackLayer trackLayer = (TrackLayer) map.getMapComponentByType(TrackLayer.class);
+		if (trackLayer != null) {
+			map.removeMapComponent(trackLayer);
+		}
+	}
+
+	public static TrackLayer createTrackLayer(String fileName, OverlayMapPanel map) {
+		 
+        Properties props = new Properties();
+        props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
+        props.put(DataStore.FILENAME, fileName);
+		DataStore dataStore = DataStoreFactory.getDataStore(props);
+		
+		if (dataStore == null) {
+			JOptionPane.showMessageDialog(DebriefMain.mainFrame, "Unknown file type for the file: " + fileName);
+			return null;
+		}
+		// initialize
+		Map<String, Track> tracks = dataStore.getTracks();
+        if (dataStore.getException().size() > 0) {
+        	String message = "Can't parse the file: " + fileName + ".";
+        	if (dataStore.getException().size() > 0) {
+        		message = message + "\nException: " + dataStore.getException().get(0).getLocalizedMessage();
+        	}
+        	JOptionPane.showMessageDialog(DebriefMain.mainFrame, message);
+        	return null;
+        }
+        TrackLayer trackLayer = new TrackLayer();
+        trackLayer.setTracks(tracks);
+        double scale = Utils.configureTracks(map, trackLayer);
+        DebriefMain.setActionEnabled(true);
+        DebriefMain.fitToWindow.setScale(scale);
+        DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
+        DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
+        return trackLayer;
+	}
+
 
 }

@@ -24,7 +24,6 @@ package org.mwc.debrief.lite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -32,12 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
-import org.mwc.debrief.lite.datastores.DataStore;
-import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.RangeBearingLayer;
-import org.mwc.debrief.lite.layers.TrackLayer;
-import org.mwc.debrief.lite.model.Track;
-import org.mwc.debrief.lite.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,20 +48,22 @@ public class DebriefMain extends AbstractMain {
 
 	private static final long serialVersionUID = 1L;
 	static final Logger logger = LoggerFactory.getLogger(DebriefMain.class);
-	
+	public static DebriefMain mainFrame;
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		
 		SwingUtilities.invokeLater(new Runnable() {
+			
 			public void run() {
 				try {
 					MapBean.suppressCopyright = true;
 					setBaseLookAndFeel();
-					DebriefMain frame = new DebriefMain();
-					frame.pack();
-					frame.setLocationRelativeTo(null);
+					mainFrame = new DebriefMain();
+					mainFrame.pack();
+					mainFrame.setLocationRelativeTo(null);
 					
 				} catch (Exception e) {
 					logger.error("DebriefMain", e);
@@ -132,31 +128,8 @@ public class DebriefMain extends AbstractMain {
         rangeBearingLayer.findAndInit(informationDelegator);
         map.addMapComponent(rangeBearingLayer);
         
-		TrackLayer trackLayer = createTrackLayer("/data/boat_file.rep", map);
-        map.addMapComponent(trackLayer);          		
-        zoomSupport.add(mapBean);
+		zoomSupport.add(mapBean);
         plotPanel.add(map);
-	}
-
-	/**
-	 * @param map 
-	 * @return track layer
-	 */
-	private TrackLayer createTrackLayer(String fileName, OverlayMapPanel map) {
-		 
-        TrackLayer trackLayer = new TrackLayer();
-        
-        Properties props = new Properties();
-        props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
-        props.put(DataStore.FILENAME, fileName);
-		DataStore dataStore = DataStoreFactory.getDataStore(props);
-        Map<String, Track> tracks = dataStore.getTracks();
-        trackLayer.setTracks(tracks);
-        double scale = Utils.configureTracks(map, trackLayer);
-        fitToWindow.setScale(scale);
-        fitToWindow.setLatitude(mapBean.getCenter().getY());
-        fitToWindow.setLongitude(mapBean.getCenter().getX());
-        return trackLayer;
-	}
+    }
 
 }

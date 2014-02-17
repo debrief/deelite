@@ -21,10 +21,20 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.actions;
 
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FilenameFilter;
+
+import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
+import org.mwc.debrief.lite.layers.TrackLayer;
+import org.mwc.debrief.lite.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.gui.OverlayMapPanel;
 
@@ -33,50 +43,50 @@ import com.bbn.openmap.gui.OverlayMapPanel;
  * @author snpe
  *
  */
-public class FitToWindowAction extends AbstractDebriefAction {
+public class OpenAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(OpenAction.class);
 	private OverlayMapPanel map;
-	private double scale, longitude, latitude;
 	
-	public FitToWindowAction() {
-		super("Fit To Window", "Fit To Window (Alt+8)", "fit_to_win.gif", KeyEvent.VK_8);
+
+	public OpenAction(OverlayMapPanel map) {
+		super("Open...");
+		putValue(SHORT_DESCRIPTION, "Open plot file...");
+		KeyStroke ctrlXKeyStroke = KeyStroke.getKeyStroke("control O");
+	    putValue(ACCELERATOR_KEY, ctrlXKeyStroke);
+	    this.map = map;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if (map != null && scale != 0) {
-			map.getMapBean().setScale((float) scale);
-			DebriefMain.getCenterSupport().fireCenter(latitude, longitude);
+		if (map == null) {
+			return;
+		}
+		FileDialog dialog = new FileDialog(DebriefMain.mainFrame, "Open plot file", FileDialog.LOAD);
+		dialog.setMultipleMode(false);
+		dialog.setFilenameFilter(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File dir, String name) {
+				for (String suffix:ReplayDataStore.SUFFIXES) {
+					if (name.endsWith(suffix)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+		dialog.setVisible(true);
+		File[] files = dialog.getFiles();
+		if (files == null || files.length <= 0) {
+			return;
+		}
+		String fileName = files[0].getAbsolutePath();
+		TrackLayer trackLayer = Utils.createTrackLayer(fileName, map);
+		if (trackLayer != null) {
+			Utils.removeTrackLayer(map);
+			map.addMapComponent(trackLayer);
 		}
 	}
-
-	/**
-	 * @param tracks
-	 */
-	public void setScale(double scale) {
-		this.scale = scale;
-		
-	}
-
-	/**
-	 * @param map the map to set
-	 */
-	public void setMap(OverlayMapPanel map) {
-		this.map = map;
-	}
-
-	/**
-	 * @param longitude the longitude to set
-	 */
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	/**
-	 * @param latitude the latitude to set
-	 */
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
+	
 }

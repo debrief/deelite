@@ -62,7 +62,6 @@ public class TrackLayer extends OMGraphicHandlerLayer {
 		RenderingHints rh = new RenderingHints(map);
 		policy.setRenderingHints(rh);
 		setRenderPolicy(policy);
-		
 	}
 
 	public synchronized OMGraphicList prepare() {

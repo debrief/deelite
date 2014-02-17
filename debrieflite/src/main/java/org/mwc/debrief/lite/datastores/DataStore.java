@@ -41,5 +41,6 @@ public interface DataStore {
 	List<Narrative> getNarratives();
 	Map<String,Track> getTracks();
 	Map<String,AnnotationLayer> getAnnotationLayers();
+	List<Exception> getException();
 
 }

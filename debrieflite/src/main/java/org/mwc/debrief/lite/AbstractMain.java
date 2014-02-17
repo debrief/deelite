@@ -52,17 +52,19 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 
 import org.mwc.debrief.lite.actions.AboutAction;
+import org.mwc.debrief.lite.actions.CloseAction;
 import org.mwc.debrief.lite.actions.FitToWindowAction;
+import org.mwc.debrief.lite.actions.OpenAction;
 import org.mwc.debrief.lite.actions.PanAction;
 import org.mwc.debrief.lite.actions.QuitAction;
 import org.mwc.debrief.lite.actions.RangeBearingAction;
-import org.mwc.debrief.lite.actions.RedrawAction;
 import org.mwc.debrief.lite.actions.ZoomInAction;
 import org.mwc.debrief.lite.actions.ZoomOutAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.MapBean;
+import com.bbn.openmap.event.CenterSupport;
 import com.bbn.openmap.event.ZoomSupport;
 import com.bbn.openmap.gui.OpenMapFrame;
 import com.bbn.openmap.gui.OverlayMapPanel;
@@ -97,12 +99,15 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected OverlayMapPanel map;
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
-	protected FitToWindowAction fitToWindow;
-	protected PanAction panAction;
-	protected ZoomInAction zoomInAction;
-	protected ZoomOutAction zoomOutAction;
-	protected RangeBearingAction rangeBearingAction;
-	protected RedrawAction redrawAction;
+	public static FitToWindowAction fitToWindow;
+	public static PanAction panAction;
+	public static ZoomInAction zoomInAction;
+	public static ZoomOutAction zoomOutAction;
+	public static RangeBearingAction rangeBearingAction;
+	//public static RedrawAction redrawAction;
+	
+	private static CenterSupport centerSupport;
+	
 
 	protected static void setBaseLookAndFeel() {
 		try {
@@ -130,6 +135,8 @@ public abstract class AbstractMain extends OpenMapFrame {
 		configureActions();
 		setJMenuBar(createMenuBar(actions));
 		createToolBar();
+		centerSupport = new CenterSupport(map.getMapBean());
+		centerSupport.add(map.getMapBean());
 	}
 
 	/**
@@ -141,8 +148,18 @@ public abstract class AbstractMain extends OpenMapFrame {
 		zoomOutAction.setZoomDelegate(zoomSupport);
 		fitToWindow.setMap(map);
 		rangeBearingAction.setMap(map);
-		//rangeBearingAction.setEnabled(false);
-		redrawAction.setEnabled(false);
+		setActionEnabled(false);
+	}
+
+	/**
+	 * @param b
+	 */
+	public static void setActionEnabled(boolean enabled) {
+		panAction.setEnabled(enabled);
+		zoomInAction.setEnabled(enabled);
+		zoomOutAction.setEnabled(enabled);
+		fitToWindow.setEnabled(enabled);
+		rangeBearingAction.setEnabled(enabled);
 	}
 
 	protected List<Action> createActions() {
@@ -152,7 +169,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		actions.add(zoomOutAction = new ZoomOutAction());
 		actions.add(fitToWindow = new FitToWindowAction());
 		actions.add(rangeBearingAction = new RangeBearingAction());
-		actions.add(redrawAction = new RedrawAction());
+		//actions.add(redrawAction = new RedrawAction());
 		return actions;
 	}
 
@@ -219,6 +236,16 @@ public abstract class AbstractMain extends OpenMapFrame {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
+        
+        // Open action
+        JMenuItem openItem = new JMenuItem();
+        openItem.setAction(new OpenAction(map));
+        fileMenu.add(openItem);
+        
+        // Close action
+        JMenuItem closeItem = new JMenuItem();
+        closeItem.setAction(new CloseAction(map));
+        fileMenu.add(closeItem);
         
         // Quit action
         JMenuItem quitItem = new JMenuItem();
@@ -338,6 +365,13 @@ public abstract class AbstractMain extends OpenMapFrame {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		return panel;
+	}
+
+	/**
+	 * @return the centerSupport
+	 */
+	public static CenterSupport getCenterSupport() {
+		return centerSupport;
 	}
 
 }

@@ -22,9 +22,15 @@
 package org.mwc.debrief.lite.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.gui.OverlayMapPanel;
 
@@ -33,50 +39,31 @@ import com.bbn.openmap.gui.OverlayMapPanel;
  * @author snpe
  *
  */
-public class FitToWindowAction extends AbstractDebriefAction {
+public class CloseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(CloseAction.class);
 	private OverlayMapPanel map;
-	private double scale, longitude, latitude;
 	
-	public FitToWindowAction() {
-		super("Fit To Window", "Fit To Window (Alt+8)", "fit_to_win.gif", KeyEvent.VK_8);
+
+	public CloseAction(OverlayMapPanel map) {
+		super("Close...");
+		putValue(SHORT_DESCRIPTION, "Close plot file...");
+		KeyStroke ctrlXKeyStroke = KeyStroke.getKeyStroke("control W");
+	    putValue(ACCELERATOR_KEY, ctrlXKeyStroke);
+	    this.map = map;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if (map != null && scale != 0) {
-			map.getMapBean().setScale((float) scale);
-			DebriefMain.getCenterSupport().fireCenter(latitude, longitude);
+		if (map == null) {
+			return;
+		}
+		int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, "Are you sure you want to close the current plot?", "Close plot", JOptionPane.OK_CANCEL_OPTION);
+		if (ok == JOptionPane.OK_OPTION) {
+			Utils.removeTrackLayer(map);
+			DebriefMain.setActionEnabled(false);
 		}
 	}
-
-	/**
-	 * @param tracks
-	 */
-	public void setScale(double scale) {
-		this.scale = scale;
-		
-	}
-
-	/**
-	 * @param map the map to set
-	 */
-	public void setMap(OverlayMapPanel map) {
-		this.map = map;
-	}
-
-	/**
-	 * @param longitude the longitude to set
-	 */
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	/**
-	 * @param latitude the latitude to set
-	 */
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
+	
+	
 }

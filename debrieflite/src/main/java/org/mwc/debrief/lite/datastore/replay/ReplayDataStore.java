@@ -54,6 +54,8 @@ import org.slf4j.LoggerFactory;
 public class ReplayDataStore implements DataStore {
 
 	private static final String COMMENT_PREFIX = ";;";
+	public static final String[] SUFFIXES = new String[]{ ".rep", ".dsf", ".dtf" };
+			
 	static final Logger logger = LoggerFactory.getLogger(ReplayDataStore.class);
 	
 	private Properties properties;
@@ -61,7 +63,7 @@ public class ReplayDataStore implements DataStore {
 	private boolean valid = true;
 	private List<Narrative> narratives = new ArrayList<Narrative>();
 	private Map<String,Track> tracks = new HashMap<String,Track>();
-	private List<Exception> exceptions;
+	private List<Exception> exceptions = new ArrayList<Exception>();
 
 	private Map<String,AnnotationLayer> annotationLayers = new HashMap<String,AnnotationLayer>();
 
@@ -146,8 +148,6 @@ public class ReplayDataStore implements DataStore {
 					return;
 				}
 				// check type ???
-				// _myTypes = new String[]
-				// { ".rep", ".dsf", ".dtf" };
 				
 				File file = new File(fileName);
 				InputStream is = null;
@@ -160,6 +160,7 @@ public class ReplayDataStore implements DataStore {
 					if (is == null) {
 						valid = false;
 						logger.info("Invalid file: {}", fileName);
+						exceptions.add(new FileNotFoundException("Can't open the " + fileName));
 						return;
 					}
 					readFile(is);
@@ -253,6 +254,7 @@ public class ReplayDataStore implements DataStore {
 	/**
 	 * @return the exception
 	 */
+	@Override
 	public List<Exception> getException() {
 		return exceptions;
 	}
