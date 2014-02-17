@@ -31,6 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
+import org.mwc.debrief.lite.dnd.PlotDropTarget;
 import org.mwc.debrief.lite.layers.RangeBearingLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,55 +82,62 @@ public class DebriefMain extends AbstractMain {
 
 	protected void createMap() {
 		map = new OverlayMapPanel(new PropertyHandler(new Properties()), true);
-        map.create();
+		map.create();
 
-        mapBean = map.getMapBean(); 
-        //mapBean.setBackgroundColor(new Color(0x99b3cc));
-        //mapBean.setBackground(Color.black);
-        LayerHandler layerHandler = new LayerHandler();
-        map.addMapComponent(layerHandler);
-        
-        layersPanel.add(new LayersPanel(layerHandler));
-        
-        InformationDelegator informationDelegator = new InformationDelegator();
-        OMMouseMode mouseMode = new OMMouseMode();
-        mouseMode.setInfoDelegator(informationDelegator);
-        
-        MouseDelegator mouseDelegator = new MouseDelegator();
-        map.addMapComponent(mouseDelegator);
-        map.addMapComponent(mouseMode);
-        mouseDelegator.setActiveMouseMode(mouseMode);
-        
-        informationDelegator.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, Color.GRAY, Color.DARK_GRAY));
+		mapBean = map.getMapBean();
+		// mapBean.setBackgroundColor(new Color(0x99b3cc));
+		LayerHandler layerHandler = new LayerHandler();
+		map.addMapComponent(layerHandler);
+
+		layersPanel.add(new LayersPanel(layerHandler));
+
+		InformationDelegator informationDelegator = new InformationDelegator();
+		OMMouseMode mouseMode = new OMMouseMode();
+		mouseMode.setInfoDelegator(informationDelegator);
+
+		MouseDelegator mouseDelegator = new MouseDelegator();
+		map.addMapComponent(mouseDelegator);
+		map.addMapComponent(mouseMode);
+		mouseDelegator.setActiveMouseMode(mouseMode);
+
+		informationDelegator.setBorder(BorderFactory.createBevelBorder(
+				BevelBorder.LOWERED, Color.GRAY, Color.DARK_GRAY));
 		add(informationDelegator, BorderLayout.SOUTH);
 		informationDelegator.setPreferredSize(new Dimension(getWidth(), 32));
-		informationDelegator.setLayout(new BoxLayout(informationDelegator, BoxLayout.X_AXIS));
-		
+		informationDelegator.setLayout(new BoxLayout(informationDelegator,
+				BoxLayout.X_AXIS));
+
 		informationDelegator.setMap(map.getMapBean());
-        informationDelegator.findAndInit(map.getMapBean());
-		
-        informationDelegator.setShowCoordsInfoLine(true);
-        informationDelegator.setShowInfoLine(true);
-        informationDelegator.setShowLights(true);
-        informationDelegator.setLightTriggers(true);
-        
-        RangeBearingLayer rangeBearingLayer = new RangeBearingLayer();
-        Properties props = new Properties();
-        props.put("rangeBearing.prettyName", "Range Bearing");
-        props.put("rangeBearing.showAttributes","false");
-        props.put("rangeBearing.editor","com.bbn.openmap.layer.editor.DrawingEditorTool");
-        props.put("rangeBearing.loaders","rangeBearing");
-        props.put("rangeBearing.rangeBearing.class","org.mwc.debrief.lite.drawing.DebriefDistanceLoader");
-        props.put("rangeBearing.rangeBearing.attributesClass","com.bbn.openmap.omGraphics.DrawingAttributes");
-        props.put("rangeBearing.rangeBearing.lineColor","FFAA0000");
-        props.put("rangeBearing.rangeBearing.mattingColor","66333333");
-        props.put("rangeBearing.rangeBearing.matted","true");
-        rangeBearingLayer.setProperties("rangeBearing", props);
-        rangeBearingLayer.findAndInit(informationDelegator);
-        map.addMapComponent(rangeBearingLayer);
-        
+		informationDelegator.findAndInit(map.getMapBean());
+
+		informationDelegator.setShowCoordsInfoLine(true);
+		informationDelegator.setShowInfoLine(true);
+		informationDelegator.setShowLights(true);
+		informationDelegator.setLightTriggers(true);
+
+		RangeBearingLayer rangeBearingLayer = new RangeBearingLayer();
+		Properties props = new Properties();
+		props.put("rangeBearing.prettyName", "Range Bearing");
+		props.put("rangeBearing.showAttributes", "false");
+		props.put("rangeBearing.editor",
+				"com.bbn.openmap.layer.editor.DrawingEditorTool");
+		props.put("rangeBearing.loaders", "rangeBearing");
+		props.put("rangeBearing.rangeBearing.class",
+				"org.mwc.debrief.lite.drawing.DebriefDistanceLoader");
+		props.put("rangeBearing.rangeBearing.attributesClass",
+				"com.bbn.openmap.omGraphics.DrawingAttributes");
+		props.put("rangeBearing.rangeBearing.lineColor", "FFAA0000");
+		props.put("rangeBearing.rangeBearing.mattingColor", "66333333");
+		props.put("rangeBearing.rangeBearing.matted", "true");
+		rangeBearingLayer.setProperties("rangeBearing", props);
+		rangeBearingLayer.findAndInit(informationDelegator);
+		map.addMapComponent(rangeBearingLayer);
+
 		zoomSupport.add(mapBean);
-        plotPanel.add(map);
-    }
+		plotPanel.add(map);
+
+		map.setDropTarget(new PlotDropTarget(map));
+
+	}
 
 }
