@@ -19,15 +19,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.model;
+package org.mwc.debrief.lite.model.impl;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import org.mwc.debrief.lite.model.Narrative;
+import org.mwc.debrief.lite.model.NarrativeEntry;
 
 /**
  * @author snpe
  *
  */
-public interface Narrative extends Named {
-	
-	List<NarrativeEntry> getEntries();
+public class NarrativeImpl implements Narrative {
+
+	private static final long serialVersionUID = 1L;
+	private String _name;
+	private List<NarrativeEntry> entries = new LinkedList<NarrativeEntry>();
+	/**
+	 * @param name
+	 */
+	public NarrativeImpl(String name) {
+		_name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Named#getName()
+	 */
+	@Override
+	public String getName() {
+		return _name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Named#setName(java.lang.String)
+	 */
+	@Override
+	public void setName(String name) {
+		_name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.model.Narrative#getEntries()
+	 */
+	@Override
+	public List<NarrativeEntry> getEntries() {
+		return entries;
+	}
+
 }

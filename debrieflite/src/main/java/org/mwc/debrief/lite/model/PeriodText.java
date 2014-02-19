@@ -21,13 +21,16 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.model;
 
-import java.util.List;
-
 /**
  * @author snpe
  *
  */
-public interface Narrative extends Named {
-	
-	List<NarrativeEntry> getEntries();
+public interface PeriodText {
+
+	String getText();
+	Spatial getLocation();
+	String getSymbology();
+	Temporal getDate();
+	Temporal getOtherDate();
+
 }

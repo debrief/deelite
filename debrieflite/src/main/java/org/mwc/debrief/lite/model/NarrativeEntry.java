@@ -26,13 +26,13 @@ package org.mwc.debrief.lite.model;
  * @author snpe
  *
  */
-public interface NarrativeEntry extends Named, Temporal {
+public interface NarrativeEntry extends Named {
 	
-	/**
-	 * 
-	 * entry type
-	 */
 	String getType();
-	void setType(String name);
+	String getEntry();
+	Temporal getDate();
+	void setType(String type);
+	void setEntry(String entry);
+	void setDate(Temporal date);
 
 }

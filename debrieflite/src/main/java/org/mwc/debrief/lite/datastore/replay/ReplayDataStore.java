@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,8 +42,10 @@ import org.mwc.debrief.lite.model.AnnotationLayer;
 import org.mwc.debrief.lite.model.Bearing;
 import org.mwc.debrief.lite.model.Narrative;
 import org.mwc.debrief.lite.model.NarrativeEntry;
+import org.mwc.debrief.lite.model.PeriodText;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Track;
+import org.mwc.debrief.lite.model.impl.NarrativeImpl;
 import org.mwc.debrief.lite.model.impl.TrackImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +64,9 @@ public class ReplayDataStore implements DataStore {
 	private Properties properties;
 	private boolean initialized = false;
 	private boolean valid = true;
-	private List<Narrative> narratives = new ArrayList<Narrative>();
+	private Map<String,Narrative> narratives = new HashMap<String,Narrative>();
 	private Map<String,Track> tracks = new HashMap<String,Track>();
+	private List<PeriodText> periodTexts = new LinkedList<PeriodText>();
 	private List<Exception> exceptions = new ArrayList<Exception>();
 
 	private Map<String,AnnotationLayer> annotationLayers = new HashMap<String,AnnotationLayer>();
@@ -95,13 +99,10 @@ public class ReplayDataStore implements DataStore {
 //		_theImporters.add(new ImportLine());
 //		_theImporters.add(new ImportVector());
 //		_theImporters.add(new ImportEllipse());
-//		_theImporters.add(new ImportPeriodText());
 //		_theImporters.add(new ImportTimeText());
 //		_theImporters.add(new ImportLabel());
 //		_theImporters.add(new ImportWheel());
 //		_theImporters.add(new ImportBearing());
-//		_theImporters.add(new ImportNarrative());
-//		_theImporters.add(new ImportNarrative2());
 //		_theImporters.add(new ImportSensor());
 //		_theImporters.add(new ImportSensor2());
 //		_theImporters.add(new ImportSensor3());
@@ -109,6 +110,10 @@ public class ReplayDataStore implements DataStore {
 //		_theImporters.add(new ImportTMA_RngBrg());
 //		_theImporters.add(new ImportPolygon());
 //		_theImporters.add(new ImportPolyline());
+
+		_theImporters.add(new ImportNarrative());
+		_theImporters.add(new ImportNarrative2());
+		_theImporters.add(new ImportPeriodText());
 
 		_theImporters.add(new ImportFix());
 		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -130,7 +135,7 @@ public class ReplayDataStore implements DataStore {
 	 * @see org.mwc.debrief.lite.datastores.DataStore#getNarattives()
 	 */
 	@Override
-	public List<Narrative> getNarratives() {
+	public Map<String, Narrative> getNarratives() {
 		init();
 		return narratives;
 	}
@@ -224,7 +229,12 @@ public class ReplayDataStore implements DataStore {
 						Track track = getTrack(name);
 						track.getBearings().add(bearing);
 					} else if (object instanceof NarrativeEntry) {
-						// TODO
+						NarrativeEntry entry = (NarrativeEntry) object;
+						String name = entry.getName();
+						Narrative narrative = getNarrative(name);
+						narrative.getEntries().add(entry);
+					} else if (object instanceof PeriodText) {
+						periodTexts.add((PeriodText) object);
 					}
 				}
 			}
@@ -242,6 +252,19 @@ public class ReplayDataStore implements DataStore {
 			tracks.put(name, track);
 		}
 		return track;
+	}
+	
+	/**
+	 * @param name
+	 * @return
+	 */
+	private Narrative getNarrative(String name) {
+		Narrative narrative = narratives.get(name);
+		if (narrative == null) {
+			narrative = new NarrativeImpl(name);
+			narratives.put(name, narrative);
+		}
+		return narrative;
 	}
 
 	/**
@@ -274,6 +297,14 @@ public class ReplayDataStore implements DataStore {
 	@Override
 	public Map<String,AnnotationLayer> getAnnotationLayers() {
 		return annotationLayers ;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.datastores.DataStore#getPeriodTexts()
+	 */
+	@Override
+	public List<PeriodText> getPeriodTexts() {
+		return periodTexts;
 	}
 
 }
