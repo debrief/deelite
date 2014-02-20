@@ -35,15 +35,19 @@ public abstract class AbstractDebriefAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public AbstractDebriefAction(String name, String shortDescription, String iconName,
-			int mnemonic) {
+	public AbstractDebriefAction(String name, String shortDescription, String iconName) {
 		super(name);
 		putValue(SHORT_DESCRIPTION, shortDescription);
 		putValue(SMALL_ICON, getIcon(iconName));
+	}
+	
+	public AbstractDebriefAction(String name, String shortDescription, String iconName,
+			int mnemonic) {
+		this(name, shortDescription, iconName);
 		putValue(MNEMONIC_KEY, mnemonic);
 	}
 
-	private ImageIcon getIcon(String imageName) {
+	protected ImageIcon getIcon(String imageName) {
 	    String location = "/icons/" + imageName;
 	    URL imageURL = getClass().getResource(location);
 	

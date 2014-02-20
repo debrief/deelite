@@ -25,14 +25,18 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
+import javax.swing.table.TableColumn;
 
+import org.mwc.debrief.lite.AbstractMain;
 import org.mwc.debrief.lite.DebriefMain;
 import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
 import org.mwc.debrief.lite.layers.TrackLayer;
+import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.utils.Utils;
+import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,19 +47,17 @@ import com.bbn.openmap.gui.OverlayMapPanel;
  * @author snpe
  *
  */
-public class OpenAction extends AbstractAction {
+public class OpenAction extends AbstractDebriefAction {
 
 	private static final long serialVersionUID = 1L;
 	static final Logger logger = LoggerFactory.getLogger(OpenAction.class);
 	private OverlayMapPanel map;
 	
 
-	public OpenAction(OverlayMapPanel map) {
-		super("Open...");
-		putValue(SHORT_DESCRIPTION, "Open plot file...");
+	public OpenAction() {
+		super("Open...", "Open plot file...", "new_con.gif");
 		KeyStroke ctrlXKeyStroke = KeyStroke.getKeyStroke("control O");
 	    putValue(ACCELERATOR_KEY, ctrlXKeyStroke);
-	    this.map = map;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -87,6 +89,41 @@ public class OpenAction extends AbstractAction {
 			Utils.removeTrackLayer(map);
 			map.addMapComponent(trackLayer);
 		}
+		List<NarrativeEntry> narrativeEntries = null;
+		if (Utils.getCurrentDataStore() != null) {
+			narrativeEntries = Utils.getCurrentDataStore().getNarrativeEntries();
+		}
+		NarrativeTableModel tableModel = new NarrativeTableModel(narrativeEntries);
+		AbstractMain.narrativeTable.setModel(tableModel);
+		for (int i = 0; i < NarrativeTableModel.COLUMN_COUNT; i++) {
+        	TableColumn column = AbstractMain.narrativeTable.getColumnModel().getColumn(i);
+        	switch (i) {
+			case 0:
+				column.setMinWidth(100);
+		        column.setPreferredWidth(120);	
+				break;
+			case 1:
+			case 2:
+		        column.setMinWidth(80);
+		        column.setPreferredWidth(100);	
+				break;
+			case 3:
+		        column.setMinWidth(100);
+		        column.setPreferredWidth(200);
+				break;
+			default:
+				break;
+			}
+			
+		}
+        
+	}
+
+	/**
+	 * @param map
+	 */
+	public void setMap(OverlayMapPanel map) {
+		this.map = map;
 	}
 	
 }

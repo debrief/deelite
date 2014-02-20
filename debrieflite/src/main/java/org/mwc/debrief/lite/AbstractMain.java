@@ -42,10 +42,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.LookAndFeel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -60,6 +64,7 @@ import org.mwc.debrief.lite.actions.QuitAction;
 import org.mwc.debrief.lite.actions.RangeBearingAction;
 import org.mwc.debrief.lite.actions.ZoomInAction;
 import org.mwc.debrief.lite.actions.ZoomOutAction;
+import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +95,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected JSplitPane mainSplitPane;
 	protected JSplitPane leftSplitPane;
 	protected JPanel timePanel;
-	protected JPanel narrativePanel;
+	public JPanel narrativePanel;
 	protected JPanel layersPanel;
 	
 	protected List<Action> actions;
@@ -99,6 +104,8 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected OverlayMapPanel map;
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
+	private OpenAction openAction;
+	public static JTable narrativeTable;
 	public static FitToWindowAction fitToWindow;
 	public static PanAction panAction;
 	public static ZoomInAction zoomInAction;
@@ -148,6 +155,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		zoomOutAction.setZoomDelegate(zoomSupport);
 		fitToWindow.setMap(map);
 		rangeBearingAction.setMap(map);
+		openAction.setMap(map);
 		setActionEnabled(false);
 	}
 
@@ -164,6 +172,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 
 	protected List<Action> createActions() {
 		List<Action> actions = new ArrayList<Action>();
+		openAction = new OpenAction();
 		actions.add(panAction = new PanAction());
 		actions.add(zoomInAction = new ZoomInAction());
 		actions.add(zoomOutAction = new ZoomOutAction());
@@ -209,12 +218,35 @@ public abstract class AbstractMain extends OpenMapFrame {
 		narrativePanel = createPanel();
 		bottomTabbedPane.add("Narrative", narrativePanel);
 		bottomPanel.add(bottomTabbedPane);
+		
+		createNarrativeTable(narrativePanel);
+	}
+
+	/**
+	 * @param panel 
+	 * 
+	 */
+	private void createNarrativeTable(JPanel panel) {
+		narrativeTable = new JTable(new NarrativeTableModel(null));
+		
+		JScrollPane scrollPane = new JScrollPane(narrativeTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+        narrativeTable.setPreferredScrollableViewportSize(narrativeTable.getPreferredSize());
+        panel.add(scrollPane);
+        
+		narrativeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		//narrativeTable.setAutoCreateRowSorter(true);
+		narrativeTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		narrativeTable.getTableHeader().setResizingAllowed(true);
 	}
 	
 	protected void createToolBar() {
 		JToolBar toolBar = new JToolBar("Debrief toolbar");
 		add(toolBar, BorderLayout.PAGE_START);
 		
+		addButton(toolBar, openAction);
+		toolBar.addSeparator();
 		for (Action action:actions) {
 			addButton(toolBar, action);
 		}
@@ -239,7 +271,7 @@ public abstract class AbstractMain extends OpenMapFrame {
         
         // Open action
         JMenuItem openItem = new JMenuItem();
-        openItem.setAction(new OpenAction(map));
+        openItem.setAction(openAction);
         fileMenu.add(openItem);
         
         // Close action

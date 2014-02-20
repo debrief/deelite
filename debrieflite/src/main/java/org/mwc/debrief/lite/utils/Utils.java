@@ -48,6 +48,8 @@ import com.bbn.openmap.omGraphics.OMPoint;
  */
 public class Utils {
 
+	private static DataStore dataStore;
+
 	/**
 	 * @param map
 	 * @param trackLayer
@@ -138,7 +140,7 @@ public class Utils {
         Properties props = new Properties();
         props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
         props.put(DataStore.FILENAME, fileName);
-		DataStore dataStore = DataStoreFactory.getDataStore(props);
+		dataStore = DataStoreFactory.getDataStore(props);
 		
 		if (dataStore == null) {
 			JOptionPane.showMessageDialog(DebriefMain.mainFrame, "Unknown file type for the file: " + fileName);
@@ -164,5 +166,7 @@ public class Utils {
         return trackLayer;
 	}
 
-
+	public static DataStore getCurrentDataStore() {
+		return dataStore;
+	}
 }

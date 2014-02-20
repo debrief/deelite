@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.mwc.debrief.lite.model.AnnotationLayer;
 import org.mwc.debrief.lite.model.Narrative;
+import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.model.PeriodText;
 import org.mwc.debrief.lite.model.Track;
 
@@ -40,6 +41,7 @@ public interface DataStore {
 	public static String FILENAME = "fileName";
 	
 	Map<String,Narrative> getNarratives();
+	List<NarrativeEntry> getNarrativeEntries();
 	Map<String,Track> getTracks();
 	List<PeriodText> getPeriodTexts();
 	Map<String,AnnotationLayer> getAnnotationLayers();

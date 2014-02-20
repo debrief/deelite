@@ -27,8 +27,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import org.mwc.debrief.lite.AbstractMain;
 import org.mwc.debrief.lite.DebriefMain;
 import org.mwc.debrief.lite.utils.Utils;
+import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +64,7 @@ public class CloseAction extends AbstractAction {
 		if (ok == JOptionPane.OK_OPTION) {
 			Utils.removeTrackLayer(map);
 			DebriefMain.setActionEnabled(false);
+			AbstractMain.narrativeTable.setModel(new NarrativeTableModel(null));
 		}
 	}
 	

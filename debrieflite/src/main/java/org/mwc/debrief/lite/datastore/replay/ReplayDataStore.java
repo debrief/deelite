@@ -68,6 +68,7 @@ public class ReplayDataStore implements DataStore {
 	private Map<String,Track> tracks = new HashMap<String,Track>();
 	private List<PeriodText> periodTexts = new LinkedList<PeriodText>();
 	private List<Exception> exceptions = new ArrayList<Exception>();
+	private List<NarrativeEntry> narrativeEntries = new LinkedList<NarrativeEntry>();
 
 	private Map<String,AnnotationLayer> annotationLayers = new HashMap<String,AnnotationLayer>();
 
@@ -233,6 +234,7 @@ public class ReplayDataStore implements DataStore {
 						String name = entry.getName();
 						Narrative narrative = getNarrative(name);
 						narrative.getEntries().add(entry);
+						narrativeEntries.add(entry);
 					} else if (object instanceof PeriodText) {
 						periodTexts.add((PeriodText) object);
 					}
@@ -296,6 +298,7 @@ public class ReplayDataStore implements DataStore {
 	 */
 	@Override
 	public Map<String,AnnotationLayer> getAnnotationLayers() {
+		init();
 		return annotationLayers ;
 	}
 
@@ -304,7 +307,17 @@ public class ReplayDataStore implements DataStore {
 	 */
 	@Override
 	public List<PeriodText> getPeriodTexts() {
+		init();
 		return periodTexts;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mwc.debrief.lite.datastores.DataStore#getNarrativeEntries()
+	 */
+	@Override
+	public List<NarrativeEntry> getNarrativeEntries() {
+		init();
+		return narrativeEntries;
 	}
 
 }
