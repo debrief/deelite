@@ -23,19 +23,26 @@ package org.mwc.debrief.lite.utils;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.net.URL;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.actions.AbstractDebriefAction;
 import org.mwc.debrief.lite.datastores.DataStore;
 import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Track;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.Environment;
 import com.bbn.openmap.gui.EmbeddedNavPanel;
@@ -48,8 +55,14 @@ import com.bbn.openmap.omGraphics.OMPoint;
  */
 public class Utils {
 
+	static final Logger logger = LoggerFactory.getLogger(AbstractDebriefAction.class);
 	private static DataStore dataStore;
+	private static final DateFormat df = new java.text.SimpleDateFormat("yy/MM/dd HH:mm");
 
+	static {
+		// check the formats are in the correct time zone
+	    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
 	/**
 	 * @param map
 	 * @param trackLayer
@@ -160,6 +173,9 @@ public class Utils {
         trackLayer.setTracks(tracks);
         double scale = Utils.configureTracks(map, trackLayer);
         DebriefMain.setActionEnabled(true);
+        if (tracks != null && tracks.size() > 0) {
+        	DebriefMain.setTimeViewEnabled(true);
+        }
         DebriefMain.fitToWindow.setScale(scale);
         DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
         DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
@@ -168,5 +184,21 @@ public class Utils {
 
 	public static DataStore getCurrentDataStore() {
 		return dataStore;
+	}
+	
+	public static ImageIcon getIcon(String imageName) {
+	    String location = "/icons/" + imageName;
+	    URL imageURL = Utils.class.getResource(location);
+	
+	    if (imageURL == null) {
+	        logger.warn("Can't find icon file: {}" + location);
+	        return null;
+	    } else {
+	        return new ImageIcon(imageURL);
+	    }
+	}
+	
+	public static DateFormat getDefaultDateFormat() {
+		return df;
 	}
 }

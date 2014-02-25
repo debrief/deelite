@@ -21,10 +21,11 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.actions;
 
-import java.net.URL;
-
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
+
+import org.mwc.debrief.lite.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -34,11 +35,13 @@ import javax.swing.ImageIcon;
 public abstract class AbstractDebriefAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
+	static final Logger logger = LoggerFactory.getLogger(AbstractDebriefAction.class);
+	
 
 	public AbstractDebriefAction(String name, String shortDescription, String iconName) {
 		super(name);
 		putValue(SHORT_DESCRIPTION, shortDescription);
-		putValue(SMALL_ICON, getIcon(iconName));
+		putValue(SMALL_ICON, Utils.getIcon(iconName));
 	}
 	
 	public AbstractDebriefAction(String name, String shortDescription, String iconName,
@@ -46,17 +49,5 @@ public abstract class AbstractDebriefAction extends AbstractAction {
 		this(name, shortDescription, iconName);
 		putValue(MNEMONIC_KEY, mnemonic);
 	}
-
-	protected ImageIcon getIcon(String imageName) {
-	    String location = "/icons/" + imageName;
-	    URL imageURL = getClass().getResource(location);
-	
-	    if (imageURL == null) {
-	        System.err.println("Can't find: " + location);
-	        return null;
-	    } else {
-	        return new ImageIcon(imageURL);
-	    }
-	}	
 
 }

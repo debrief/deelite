@@ -64,6 +64,7 @@ public class CloseAction extends AbstractAction {
 		if (ok == JOptionPane.OK_OPTION) {
 			Utils.removeTrackLayer(map);
 			DebriefMain.setActionEnabled(false);
+			DebriefMain.setTimeViewEnabled(false);
 			AbstractMain.narrativeTable.setModel(new NarrativeTableModel(null));
 		}
 	}

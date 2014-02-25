@@ -64,6 +64,7 @@ import org.mwc.debrief.lite.actions.QuitAction;
 import org.mwc.debrief.lite.actions.RangeBearingAction;
 import org.mwc.debrief.lite.actions.ZoomInAction;
 import org.mwc.debrief.lite.actions.ZoomOutAction;
+import org.mwc.debrief.lite.dnd.time.TimeView;
 import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
 	private OpenAction openAction;
+	public static TimeView timeView;
 	public static JTable narrativeTable;
 	public static FitToWindowAction fitToWindow;
 	public static PanAction panAction;
@@ -146,9 +148,6 @@ public abstract class AbstractMain extends OpenMapFrame {
 		centerSupport.add(map.getMapBean());
 	}
 
-	/**
-	 * 
-	 */
 	private void configureActions() {
 		panAction.setMap(map);
 		zoomInAction.setZoomDelegate(zoomSupport);
@@ -160,7 +159,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 	}
 
 	/**
-	 * @param b
+	 * @param enabled
 	 */
 	public static void setActionEnabled(boolean enabled) {
 		panAction.setEnabled(enabled);
@@ -168,6 +167,10 @@ public abstract class AbstractMain extends OpenMapFrame {
 		zoomOutAction.setEnabled(enabled);
 		fitToWindow.setEnabled(enabled);
 		rangeBearingAction.setEnabled(enabled);
+	}
+	
+	public static void setTimeViewEnabled(boolean enabled) {
+		timeView.setWidgetsEnabled(enabled);
 	}
 
 	protected List<Action> createActions() {
@@ -193,7 +196,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		plotPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		leftPanel = createPanel();
 		
-		mainSplitPane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, 250,
+		mainSplitPane = createSplitPane(JSplitPane.HORIZONTAL_SPLIT, 370,
 				leftPanel, plotPanel);
 
         topPanel = createPanel();
@@ -210,9 +213,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		layersPanel = createPanel();
 		topTabbedPane.add("Layers", layersPanel);
 		
-		timePanel = createPanel();
-		topTabbedPane.add("Time", timePanel);
-		topPanel.add(topTabbedPane);
+		createTimePanel(topTabbedPane);
 		
 		JTabbedPane bottomTabbedPane = new JTabbedPane();
 		narrativePanel = createPanel();
@@ -220,6 +221,18 @@ public abstract class AbstractMain extends OpenMapFrame {
 		bottomPanel.add(bottomTabbedPane);
 		
 		createNarrativeTable(narrativePanel);
+	}
+
+	private void createTimePanel(JTabbedPane topTabbedPane) {
+		timePanel = createPanel();
+		topTabbedPane.add("Time", timePanel);
+		topPanel.add(topTabbedPane);
+		timeView = new TimeView();
+		JScrollPane scrollPane = new JScrollPane(timeView, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		timePanel.add(scrollPane);
+		
 	}
 
 	/**

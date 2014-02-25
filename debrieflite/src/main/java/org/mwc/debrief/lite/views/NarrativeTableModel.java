@@ -21,13 +21,12 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.views;
 
-import java.text.DateFormat;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.mwc.debrief.lite.model.NarrativeEntry;
+import org.mwc.debrief.lite.utils.Utils;
 
 /**
  * @author snpe
@@ -37,8 +36,7 @@ public class NarrativeTableModel extends AbstractTableModel {
 
 	public static final int COLUMN_COUNT = 4; // Time, Source, Type , Entry
 	private static final long serialVersionUID = 1L;
-	private static final DateFormat df = new java.text.SimpleDateFormat("yy/MM/dd HH:mm");
-   
+	
 	private List<NarrativeEntry> narrativeEntries;
 	
 	/**
@@ -76,9 +74,7 @@ public class NarrativeTableModel extends AbstractTableModel {
 		NarrativeEntry entry = narrativeEntries.get(rowIndex);
 		switch (columnIndex) {
 		case 0:
-			// check the formats are in the correct time zone
-		    df.setTimeZone(TimeZone.getTimeZone("GMT"));
-			return df.format(entry.getDate().getDate());
+			return Utils.getDefaultDateFormat().format(entry.getDate().getDate());
 		case 1:
 			return entry.getName();
 		case 2:
