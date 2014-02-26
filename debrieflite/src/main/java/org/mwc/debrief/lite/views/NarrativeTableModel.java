@@ -109,4 +109,11 @@ public class NarrativeTableModel extends AbstractTableModel {
 		return super.getColumnName(column);
 	}
 
+	/**
+	 * @return the narrativeEntries
+	 */
+	public List<NarrativeEntry> getNarrativeEntries() {
+		return narrativeEntries;
+	}
+
 }

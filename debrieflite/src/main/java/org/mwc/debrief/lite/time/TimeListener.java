@@ -19,23 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.model;
+package org.mwc.debrief.lite.time;
 
-import java.util.Date;
 
 /**
  * @author snpe
- *
- * Base Temporal object
  * 
  */
-public interface Temporal extends Comparable<Temporal> {
-	
-	/**
-	 * 
-	 * time in microsecond;
-	 */
-	long getMicros();
-	long getTime();
-	Date getDate();
+public interface TimeListener {
+	Object getSource();
+	void newTime(TimeEvent event);
 }

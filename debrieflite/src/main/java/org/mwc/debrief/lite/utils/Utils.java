@@ -40,7 +40,9 @@ import org.mwc.debrief.lite.datastores.DataStore;
 import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.PositionFix;
+import org.mwc.debrief.lite.model.Temporal;
 import org.mwc.debrief.lite.model.Track;
+import org.mwc.debrief.lite.time.TimeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,6 +146,7 @@ public class Utils {
 	public static void removeTrackLayer(OverlayMapPanel map) {
 		TrackLayer trackLayer = (TrackLayer) map.getMapComponentByType(TrackLayer.class);
 		if (trackLayer != null) {
+			DebriefMain.getTimeController().removeTimeListener(trackLayer);
 			map.removeMapComponent(trackLayer);
 		}
 	}
@@ -173,9 +176,6 @@ public class Utils {
         trackLayer.setTracks(tracks);
         double scale = Utils.configureTracks(map, trackLayer);
         DebriefMain.setActionEnabled(true);
-        if (tracks != null && tracks.size() > 0) {
-        	DebriefMain.setTimeViewEnabled(true);
-        }
         DebriefMain.fitToWindow.setScale(scale);
         DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
         DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
@@ -200,5 +200,13 @@ public class Utils {
 	
 	public static DateFormat getDefaultDateFormat() {
 		return df;
+	}
+	
+	public static void currentTimeChanged(Temporal currentTime, Object object) {
+		if (currentTime != null) {
+			DebriefMain.getTimeController().notifyListeners(new TimeEvent(currentTime.getTime(), object));
+		} else {
+			DebriefMain.getTimeController().notifyListeners(new TimeEvent(0l, object));
+		}
 	}
 }

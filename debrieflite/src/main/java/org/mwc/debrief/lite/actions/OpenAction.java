@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.KeyStroke;
 import javax.swing.table.TableColumn;
@@ -35,6 +36,7 @@ import org.mwc.debrief.lite.DebriefMain;
 import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.NarrativeEntry;
+import org.mwc.debrief.lite.model.Track;
 import org.mwc.debrief.lite.utils.Utils;
 import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
@@ -84,10 +86,15 @@ public class OpenAction extends AbstractDebriefAction {
 			return;
 		}
 		String fileName = files[0].getAbsolutePath();
+		DebriefMain.setTimeViewEnabled(false);
 		TrackLayer trackLayer = Utils.createTrackLayer(fileName, map);
 		if (trackLayer != null) {
 			Utils.removeTrackLayer(map);
 			map.addMapComponent(trackLayer);
+			Map<String, Track> tracks = trackLayer.getTracks();
+			if (tracks != null && tracks.size() > 0) {
+				DebriefMain.setTimeViewEnabled(true);
+			}
 		}
 		List<NarrativeEntry> narrativeEntries = null;
 		if (Utils.getCurrentDataStore() != null) {

@@ -19,12 +19,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.events;
+package org.mwc.debrief.lite.time;
 
 /**
  * @author snpe
  *
  */
-public interface TimeInterface extends DebriefMessage<Long> {
+public class TimeEvent {
+	
+	private long time;
+	private Object source;
+	
+	/**
+	 * @param time
+	 * @param source
+	 */
+	public TimeEvent(long time, Object source) {
+		this.time = time;
+		this.source = source;
+	}
+	
+	/**
+	 * @return the time
+	 */
+	public long getTime() {
+		return time;
+	}
+	/**
+	 * @param time the time to set
+	 */
+	public void setTime(long time) {
+		this.time = time;
+	}
+	/**
+	 * @return the source
+	 */
+	public Object getSource() {
+		return source;
+	}
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(Object source) {
+		this.source = source;
+	}
 
 }

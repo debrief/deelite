@@ -24,10 +24,13 @@ package org.mwc.debrief.lite;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -64,7 +67,12 @@ import org.mwc.debrief.lite.actions.QuitAction;
 import org.mwc.debrief.lite.actions.RangeBearingAction;
 import org.mwc.debrief.lite.actions.ZoomInAction;
 import org.mwc.debrief.lite.actions.ZoomOutAction;
-import org.mwc.debrief.lite.dnd.time.TimeView;
+import org.mwc.debrief.lite.model.NarrativeEntry;
+import org.mwc.debrief.lite.model.Temporal;
+import org.mwc.debrief.lite.time.TimeController;
+import org.mwc.debrief.lite.time.TimeEvent;
+import org.mwc.debrief.lite.time.TimeListener;
+import org.mwc.debrief.lite.time.TimeView;
 import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,10 +110,11 @@ public abstract class AbstractMain extends OpenMapFrame {
 	protected List<Action> actions;
 
 	protected MapBean mapBean;
-	protected OverlayMapPanel map;
+	protected static OverlayMapPanel map;
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
 	private OpenAction openAction;
+	private static TimeController timeController;
 	public static TimeView timeView;
 	public static JTable narrativeTable;
 	public static FitToWindowAction fitToWindow;
@@ -137,6 +146,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 		screenSize.width *= 0.9;
 		setPreferredSize(screenSize);
 		setVisible(true);
+		timeController = new TimeController();
 		configurePanels();
 		zoomSupport = new ZoomSupport(this);
 		actions = createActions();
@@ -170,7 +180,7 @@ public abstract class AbstractMain extends OpenMapFrame {
 	}
 	
 	public static void setTimeViewEnabled(boolean enabled) {
-		timeView.setWidgetsEnabled(enabled);
+		timeView.setTimeViewEnabled(enabled);
 	}
 
 	protected List<Action> createActions() {
@@ -252,6 +262,62 @@ public abstract class AbstractMain extends OpenMapFrame {
 		//narrativeTable.setAutoCreateRowSorter(true);
 		narrativeTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		narrativeTable.getTableHeader().setResizingAllowed(true);
+		DebriefMain.getTimeController().addTimeListener(new TimeListener() {
+			
+			@Override
+			public void newTime(TimeEvent event) {
+				if (event.getSource() == AbstractMain.this) {
+					return;
+				}
+				NarrativeTableModel model = (NarrativeTableModel) narrativeTable.getModel();
+				if (model.getRowCount() <= 0) {
+					return;
+				}
+				long newTime = event.getTime();
+				List<NarrativeEntry> entries = model.getNarrativeEntries();
+				if (entries == null || entries.size() <= 0) {
+					return;
+				}
+				int index = -1;
+				long difference = Long.MAX_VALUE;
+				for (NarrativeEntry entry:entries) {
+					Temporal date = entry.getDate();
+					if (date != null) {
+						long time = date.getTime();
+						long diff = Math.abs(time - newTime);
+						if (diff < difference) {
+							difference = diff;
+							index = entries.indexOf(entry);
+						}
+					}
+				}
+				if (index > -1 && difference < 1*1000*60) {
+					narrativeTable.setRowSelectionInterval(index, index);
+				}
+			}
+			
+			@Override
+			public Object getSource() {
+				return AbstractMain.this;
+			}
+		});
+		
+		narrativeTable.addMouseListener(new MouseAdapter() {
+		    public void mousePressed(MouseEvent e) {
+		    	if (e.getClickCount() == 2) {
+		    		Point p = e.getPoint();
+		    		int row = narrativeTable.rowAtPoint(p);
+		    		NarrativeTableModel model = (NarrativeTableModel) narrativeTable.getModel();
+					List<NarrativeEntry> entries = model.getNarrativeEntries();
+					if (entries != null && row >= 0 && entries.size() >= row) {
+						NarrativeEntry entry = entries.get(row);
+						if (entry != null && entry.getDate() != null) {
+							DebriefMain.getTimeController().notifyListeners(new TimeEvent(entry.getDate().getTime(), AbstractMain.this));
+						}
+					}
+		        }
+		    }
+		});
 	}
 	
 	protected void createToolBar() {
@@ -417,6 +483,20 @@ public abstract class AbstractMain extends OpenMapFrame {
 	 */
 	public static CenterSupport getCenterSupport() {
 		return centerSupport;
+	}
+
+	/**
+	 * @return the timeController
+	 */
+	public static TimeController getTimeController() {
+		return timeController;
+	}
+
+	/**
+	 * @return the map
+	 */
+	public static OverlayMapPanel getMap() {
+		return map;
 	}
 
 }

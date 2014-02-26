@@ -19,23 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.mwc.debrief.lite.model;
+package org.mwc.debrief.lite.time;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author snpe
  *
- * Base Temporal object
- * 
  */
-public interface Temporal extends Comparable<Temporal> {
+public class TimeController {
 	
-	/**
-	 * 
-	 * time in microsecond;
-	 */
-	long getMicros();
-	long getTime();
-	Date getDate();
+	private static final List<TimeListener> listeners = new ArrayList<TimeListener>();
+	
+	public void addTimeListener(TimeListener listener) {
+		if (listener != null) {
+			listeners.add(listener);
+		}
+	}
+	
+	public void removeTimeListener(TimeListener listener) {
+		listeners.remove(listener);
+	}
+	
+	public void notifyListeners(TimeEvent event) {
+		if (event == null) {
+			return;
+		}
+		for (TimeListener l:listeners) {
+			if (!event.getSource().equals(l.getSource())) {
+				l.newTime(event);
+			}
+		}
+	}
+
 }

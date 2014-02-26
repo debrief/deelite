@@ -29,7 +29,7 @@ import org.mwc.debrief.lite.model.Temporal;
  * @author snpe
  *
  */
-public class TemporalImpl implements Temporal, Comparable<Temporal> {
+public class TemporalImpl implements Temporal {
 	
 	private long micros;
 	
@@ -129,7 +129,7 @@ public class TemporalImpl implements Temporal, Comparable<Temporal> {
 	 */
 	@Override
 	public String toString() {
-		return "TemporalImpl [micros=" + micros + ", getDate()=" + getDate()
+		return "TemporalImpl [millis=" + micros/1000 + ", getDate()=" + getDate()
 				+ "]";
 	}
 
