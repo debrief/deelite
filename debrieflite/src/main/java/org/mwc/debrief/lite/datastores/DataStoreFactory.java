@@ -23,6 +23,7 @@ package org.mwc.debrief.lite.datastores;
 
 import java.util.Properties;
 
+import org.mwc.debrief.lite.datastore.gpx.GpxDataStore;
 import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
 
 /**
@@ -34,6 +35,9 @@ public class DataStoreFactory {
 	public static DataStore getDataStore(Properties properties) {
 		if (DataStore.REPLAY_TYPE.equals(properties.getProperty(DataStore.TYPE))) {
 			return new ReplayDataStore(properties);
+		}
+		if (DataStore.GPX_TYPE.equals(properties.getProperty(DataStore.TYPE))) {
+			return new GpxDataStore(properties);
 		}
 		return null;
 	}

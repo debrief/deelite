@@ -31,22 +31,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.mwc.debrief.lite.datastores.AbstractDataStore;
 import org.mwc.debrief.lite.datastores.DataStore;
-import org.mwc.debrief.lite.model.AnnotationLayer;
 import org.mwc.debrief.lite.model.Bearing;
 import org.mwc.debrief.lite.model.Narrative;
 import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.model.PeriodText;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Track;
-import org.mwc.debrief.lite.model.impl.NarrativeImpl;
-import org.mwc.debrief.lite.model.impl.TrackImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,32 +51,16 @@ import org.slf4j.LoggerFactory;
  * @author snpe
  * 
  */
-public class ReplayDataStore implements DataStore {
+public class ReplayDataStore extends AbstractDataStore {
 
 	private static final String COMMENT_PREFIX = ";;";
 	public static final String[] SUFFIXES = new String[]{ ".rep", ".dsf", ".dtf" };
 			
 	static final Logger logger = LoggerFactory.getLogger(ReplayDataStore.class);
 	
-	private Properties properties;
-	private boolean initialized = false;
-	private boolean valid = true;
-	private Map<String,Narrative> narratives = new HashMap<String,Narrative>();
-	private Map<String,Track> tracks = new HashMap<String,Track>();
-	private List<PeriodText> periodTexts = new LinkedList<PeriodText>();
-	private List<Exception> exceptions = new ArrayList<Exception>();
-	private List<NarrativeEntry> narrativeEntries = new LinkedList<NarrativeEntry>();
-
-	private Map<String,AnnotationLayer> annotationLayers = new HashMap<String,AnnotationLayer>();
-
-	/**
-	 * the format we use to parse text
-	 */
-	private static final java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
-			"yyMMdd HHmmss.SSS");
 	private static List<LineImporter> _theImporters = new ArrayList<LineImporter>();
 
-	static private Map<String, Color> colors = new HashMap<String, Color>(); 
+	private static Map<String, Color> colors = new HashMap<String, Color>(); 
 
 	static {
 		colors.put("@", Color.white);
@@ -130,21 +111,11 @@ public class ReplayDataStore implements DataStore {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mwc.debrief.lite.datastores.DataStore#getNarattives()
-	 */
-	@Override
-	public Map<String, Narrative> getNarratives() {
-		init();
-		return narratives;
-	}
-
 	/**
 	 * read replay file
 	 */
-	private synchronized void init() {
+	@Override
+	public synchronized void init() {
 		if (!initialized) {
 			if (valid) {
 				String fileName = properties.getProperty(DataStore.FILENAME);
@@ -242,82 +213,4 @@ public class ReplayDataStore implements DataStore {
 			}
 		}
 	}
-
-	/**
-	 * @param name
-	 * @return
-	 */
-	private Track getTrack(String name) {
-		Track track = tracks.get(name);
-		if (track == null) {
-			track = new TrackImpl(name);
-			tracks.put(name, track);
-		}
-		return track;
-	}
-	
-	/**
-	 * @param name
-	 * @return
-	 */
-	private Narrative getNarrative(String name) {
-		Narrative narrative = narratives.get(name);
-		if (narrative == null) {
-			narrative = new NarrativeImpl(name);
-			narratives.put(name, narrative);
-		}
-		return narrative;
-	}
-
-	/**
-	 * @return the valid
-	 */
-	public boolean isValid() {
-		return valid;
-	}
-
-	/**
-	 * @return the exception
-	 */
-	@Override
-	public List<Exception> getException() {
-		return exceptions;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.datastores.DataStore#getTracks()
-	 */
-	@Override
-	public Map<String, Track> getTracks() {
-		init();
-		return tracks;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.datastores.DataStore#getAnnotationLayers()
-	 */
-	@Override
-	public Map<String,AnnotationLayer> getAnnotationLayers() {
-		init();
-		return annotationLayers ;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.datastores.DataStore#getPeriodTexts()
-	 */
-	@Override
-	public List<PeriodText> getPeriodTexts() {
-		init();
-		return periodTexts;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mwc.debrief.lite.datastores.DataStore#getNarrativeEntries()
-	 */
-	@Override
-	public List<NarrativeEntry> getNarrativeEntries() {
-		init();
-		return narrativeEntries;
-	}
-
 }

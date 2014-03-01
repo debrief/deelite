@@ -37,6 +37,7 @@ import org.mwc.debrief.lite.model.Track;
 public interface DataStore {
 	
 	public static String REPLAY_TYPE = "rep";
+	public static String GPX_TYPE = "gpx";
 	public static String TYPE = "type";
 	public static String FILENAME = "fileName";
 	
