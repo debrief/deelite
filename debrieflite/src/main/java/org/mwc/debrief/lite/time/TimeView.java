@@ -77,12 +77,36 @@ public class TimeView extends JPanel implements TimeListener {
 	private boolean changing = false;
 	private boolean playing = false;
 	private Thread playingThread;
+	private JButton snailButton;
+	boolean snailMode = false;
 
 	public TimeView() {
 		super();
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		JPanel snailPanel = new JPanel();
+		snailPanel.setMaximumSize(new Dimension(snailPanel.getMaximumSize().width, 80));
+		snailPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		
+		add(snailPanel);
+		add(Box.createRigidArea(new Dimension(0,5)));
+		
+		snailButton = new JButton();
+		setSnailMode(false);
+		snailPanel.add(snailButton);
+		snailButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setSnailMode(!snailMode);
+				TrackLayer trackLayer = (TrackLayer) AbstractMain.getMap().getMapComponentByType(TrackLayer.class);
+				if (trackLayer != null) {
+					trackLayer.setSnailMode(snailMode);
+				}
+			}
+		});
+		
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setMaximumSize(new Dimension(buttonPanel.getMaximumSize().width, 100));
+		buttonPanel.setMaximumSize(new Dimension(buttonPanel.getMaximumSize().width, 80));
 		add(buttonPanel);
 		add(Box.createRigidArea(new Dimension(0,5)));
 		
@@ -229,6 +253,21 @@ public class TimeView extends JPanel implements TimeListener {
 			}
 		};
 		playingThread.start();
+		setWidgetsEnabled(false);
+	}
+
+	/**
+	 * @param b
+	 */
+	private void setSnailMode(boolean mode) {
+		if (mode) {
+			snailButton.setIcon(Utils.getIcon("normal.gif"));
+			snailButton.setToolTipText("Set Normal Mode");
+		} else {
+			snailButton.setIcon(Utils.getIcon("snail.gif"));
+			snailButton.setToolTipText("Set Snail Mode");
+		}
+		snailMode = mode;
 	}
 
 	public void setTimeViewEnabled(boolean enabled) {
@@ -251,6 +290,7 @@ public class TimeView extends JPanel implements TimeListener {
 	 * @param enabled
 	 */
 	private void setWidgetsEnabled(boolean enabled) {
+		snailButton.setEnabled(enabled);
 		startButton.setEnabled(enabled);
 		backLargeButton.setEnabled(enabled);
 		backSmallButton.setEnabled(enabled);

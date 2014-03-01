@@ -25,11 +25,16 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.RenderingHints.Key;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.graphics.DebriefLine;
+import org.mwc.debrief.lite.graphics.DebriefPoint;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Temporal;
 import org.mwc.debrief.lite.model.Track;
@@ -64,6 +69,8 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	private Temporal startTime;
 	private Temporal endTime;
 	private Map<String, Track> tracks;
+	private Map<Track, TrackInfo> trackInfos = new HashMap<Track, TrackInfo>();
+	private boolean snailMode;
 	
 	public TrackLayer() {
 		setName("Tracks");
@@ -106,8 +113,19 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		OMGraphicList pointList = new OMGraphicList();
 		
 		for (Track track:tracks.values()) {
-			OMGraphicList trackList = getTrackList(track);
-			pointList.addAll(trackList);
+			if (track != null && track.getPositionFixes() != null && track.getPositionFixes().size() > 0) {
+				List<DebriefLine> trackList = getTrackList(track);
+				pointList.addAll(trackList);
+				PositionFix fix = track.getPositionFixes().get(0);
+				currentTime = fix.getTemporal();
+				if (currentTime != null) {
+					newTime(new TimeEvent(currentTime.getTime(), this));
+				}
+				OMPoint currentPoint = getPoint(fix);
+				pointList.add(currentPoint);
+				TrackInfo info = new TrackInfo(fix, fix, currentPoint, trackList);
+				trackInfos.put(track, info);
+			}
 		}		
 		
 //		if (center != null) {
@@ -116,22 +134,6 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 
 		omList.add(pointList);
 
-		PositionFix currentPositionFix = null;
-		currentTime = null;
-		
-		if (tracks != null) {
-			for (Track track:tracks.values()) {
-				if (track != null && track.getPositionFixes() != null && track.getPositionFixes().size() > 0) {
-					currentPositionFix = track.getPositionFixes().get(0);
-					currentTime = currentPositionFix.getTemporal();
-					if (currentTime != null) {
-						newTime(new TimeEvent(currentTime.getTime(), this));
-					}
-					OMPoint currentPoint = getPoint(currentPositionFix);
-					omList.add(currentPoint);
-				}
-			}
-		} 
 		Utils.currentTimeChanged(currentTime, this);
 		return omList;
 	}
@@ -140,12 +142,12 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	 * @param track
 	 * @return
 	 */
-	private OMGraphicList getTrackList(Track track) {
-		OMGraphicList trackList = new OMGraphicList();
-		OMPoint latest = null;
+	private List<DebriefLine> getTrackList(Track track) {
+		List<DebriefLine> trackList = new LinkedList<DebriefLine>();
+		DebriefPoint latest = null;
 		startTime = endTime = null;
 		for (PositionFix positionFix:track.getPositionFixes()) {
-			OMPoint point = new OMPoint(positionFix.getSpatial().getLatitude(), positionFix.getSpatial().getLongitude(), 3);
+			DebriefPoint point = new DebriefPoint(positionFix, 3);
 			Temporal temporal = positionFix.getTemporal();
 			if (temporal != null) {
 				if (startTime == null || temporal.compareTo(startTime) < 0) {
@@ -156,7 +158,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 				}
 			}
 			if (latest != null) {
-				OMLine line = new OMLine(latest.getLat(), latest.getLon(), point.getLat(), point.getLon(), OMGraphic.LINETYPE_GREATCIRCLE);
+				DebriefLine line = new DebriefLine(latest, point, OMGraphic.LINETYPE_GREATCIRCLE);
 				String symbology = positionFix.getSymbology();
 				line.setLinePaint(ReadingUtility.getSymbologyColor(symbology));
 				line.setStroke(new BasicStroke(2));
@@ -167,8 +169,8 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		return trackList;
 	}
 	
-	private OMPoint getPoint(PositionFix positionFix) {
-		OMPoint point = new OMPoint(positionFix.getSpatial().getLatitude(), positionFix.getSpatial().getLongitude(), 6);
+	private DebriefPoint getPoint(PositionFix positionFix) {
+		DebriefPoint point = new DebriefPoint(positionFix, 6);
 		point.setLinePaint(Color.white);
 		point.setOval(false);
 		point.putAttribute(OMGraphicConstants.LABEL, new OMTextLabeler(positionFix.getName()));
@@ -245,11 +247,8 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 			if (newTime == currentTime.getTime()) {
 				return;
 			}
-			OMGraphicList omg = calculateTimePoints(newTime); 
-			if (omg != null) {
-				setList(omg);
-				doPrepare();
-			}
+			currentTime = new TemporalImpl(newTime);
+			refreshList();
 		}
 	}
 
@@ -257,67 +256,141 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	 * @param newTime
 	 * @return
 	 */
-	private OMGraphicList calculateTimePoints(long newTime) {
+	private OMGraphicList calculateTimePoints() {
 		tracks = getTracks();
 		if (tracks == null || tracks.size() <= 0) {
 			return null;
 		}
+		for (Track track:tracks.values()) {
+			calculateTimePoints(track);
+		}
 		OMGraphicList omg = new OMGraphicList();
-		omg.addAll(getList());
-		Iterator<OMGraphic> iterator = omg.iterator();
-		while (iterator.hasNext()) {
-			OMGraphic graphic = iterator.next();
-			if (graphic instanceof OMPoint) {
-				iterator.remove();
+		if (!snailMode) {
+			for (Track track : tracks.values()) {
+				TrackInfo info = trackInfos.get(track);
+				if (info != null) {
+					if (info.getLineList() != null) {
+						omg.addAll(info.getLineList());
+					}
+					if (info.getCurrentPoint() != null) {
+						omg.add(info.getCurrentPoint());
+					}
+				}
+			}
+		} else {
+			for (Track track : tracks.values()) {
+				TrackInfo info = trackInfos.get(track);
+				if (info != null) {
+					List<OMLine> snailLines = createSnailList(track);
+					omg.addAll(snailLines);
+					if (info.getCurrentPoint() != null) {
+						omg.add(info.getCurrentPoint());
+					}
+				}
 			}
 		}
-		currentTime = new TemporalImpl(newTime);
-		for (Track track:tracks.values()) {
-			calculateTimePoints(track, omg);
-		}
-		
 		return omg;
+	}
+
+	/**
+	 * @param info
+	 * @return
+	 */
+	private List<OMLine> createSnailList(Track track) {
+		List<OMLine> lines = new ArrayList<OMLine>();
+		if (track == null) {
+			return lines;
+		}
+		TrackInfo info = trackInfos.get(track);
+		if (info == null) {
+			return lines;
+		}
+		OMPoint currentPoint = info.getCurrentPoint();
+		PositionFix fix = info.getStartFix() == null ? info.getEndFix() : info.getStartFix();
+		if (fix != null && fix.getTemporal() != null) {
+			List<PositionFix> positionFixes = track.getPositionFixes();
+			if (positionFixes == null) {
+				return lines;
+			}
+			int index = positionFixes.indexOf(fix);
+			long time = currentTime.getTime() - 10*60*1000;
+			long fixTime = fix.getTemporal().getTime();
+			double lat = currentPoint.getLat();
+			double lon = currentPoint.getLon();
+			int alpha = 255;
+			int alphaStep = 30;
+			while (fixTime > time) {
+				OMLine line = new OMLine(lat,
+						lon, fix.getSpatial().getLatitude(),
+						fix.getSpatial().getLongitude(),
+						OMGraphic.LINETYPE_GREATCIRCLE);
+				String symbology = fix.getSymbology();
+				Color color = ReadingUtility.getSymbologyColor(symbology);
+				if (alpha != 255) {
+					color = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+				}
+				line.setLinePaint(color);
+				line.setStroke(new BasicStroke(2));
+				lines.add(line);
+				index--;
+				if (index < 0) {
+					return lines;
+				}
+				lat = fix.getSpatial().getLatitude();
+				lon = fix.getSpatial().getLongitude();
+				fix = positionFixes.get(index);
+				if (fix == null || fix.getTemporal() == null) {
+					return lines;
+				}
+				fixTime = fix.getTemporal().getTime();
+				if (alpha > 30) {
+					alpha-=alphaStep;
+				}
+			}
+		}
+		return lines;
 	}
 
 	/**
 	 * @param track
 	 * @param omg 
 	 */
-	private void calculateTimePoints(Track track, OMGraphicList omg) {
+	private void calculateTimePoints(Track track) {
 		if (track != null && track.getPositionFixes().size() > 0) {
-			PositionFix latestFix = null;
+			PositionFix startFix = null;
+			PositionFix endFix = null;
+			OMPoint currentPoint =null;
 			for (PositionFix positionFix:track.getPositionFixes()) {
 				Temporal fixTemporal = positionFix.getTemporal();
 				if (fixTemporal == null) {
 					continue;
 				}
 				if (currentTime.equals(fixTemporal)) {
-					OMPoint point = getPoint(positionFix);
-					omg.add(point);
-					latestFix = null;
+					currentPoint = getPoint(positionFix);
+					startFix = positionFix;
 					break;
 				}
 				if (fixTemporal.compareTo(currentTime) < 0) {
-					latestFix = positionFix;
+					startFix = positionFix;
 				} else {
 					break;
 				}
 			}
-			if (latestFix != null) {
-				int index = track.getPositionFixes().indexOf(latestFix);
+			if (currentPoint == null) {
+				int index = track.getPositionFixes().indexOf(startFix);
 				if (index >= 0 && track.getPositionFixes().size() >= index+1) {
-					PositionFix nextFix = track.getPositionFixes().get(index + 1);
-					Temporal start = latestFix.getTemporal();
-					Temporal end = nextFix.getTemporal();
+					endFix = track.getPositionFixes().get(index + 1);
+					Temporal start = startFix.getTemporal();
+					Temporal end = endFix.getTemporal();
 					if (start != null && end != null) {
 						long time = currentTime.getTime() - start.getTime();
 						long timeRange = end.getTime() - start.getTime();
 						if (timeRange > 0) {
 							double[] points = new double[4];
-							points[0] = nextFix.getSpatial().getLatitude();
-							points[1] = nextFix.getSpatial().getLongitude();
-							points[2] = latestFix.getSpatial().getLatitude();
-							points[3] = latestFix.getSpatial().getLongitude();
+							points[0] = endFix.getSpatial().getLatitude();
+							points[1] = endFix.getSpatial().getLongitude();
+							points[2] = startFix.getSpatial().getLatitude();
+							points[3] = startFix.getSpatial().getLongitude();
 							ProjMath.arrayDegToRad(points);
 							double distanceRange = GreatCircle.sphericalDistance(points[0], points[1],
 											points[2], points[3]);
@@ -327,14 +400,21 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 							LatLonPoint llp = GreatCircle.pointAtDistanceBetweenPoints(points[0], points[1],
 											points[2], points[3], distance, -1);
 							if (llp != null) {
-								OMPoint point = getPoint(llp, latestFix.getName());
-								omg.add(point);
+								currentPoint = getPoint(llp, startFix.getName());
+								//omg.add(currentPoint);
 							}
 						}
-						
 					}
-					
 				}
+			}
+			
+			TrackInfo trackInfo = trackInfos.get(track);
+			if (trackInfo == null) {
+				logger.warning("trackInfo is null for track" + track.getName());
+			} else {
+				trackInfo.setCurrentPoint(currentPoint);
+				trackInfo.setStartFix(startFix);
+				trackInfo.setEndFix(endFix);
 			}
 		}
 	}
@@ -372,6 +452,22 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	 */
 	public Temporal getEndTime() {
 		return endTime;
+	}
+
+	/**
+	 * @param snailMode
+	 */
+	public void setSnailMode(boolean snailMode) {
+		this.snailMode = snailMode;
+		refreshList();
+	}
+
+	private void refreshList() {
+		OMGraphicList omg = calculateTimePoints(); 
+		if (omg != null) {
+			setList(omg);
+			doPrepare();
+		}
 	}
 
 }
