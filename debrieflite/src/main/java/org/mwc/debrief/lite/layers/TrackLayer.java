@@ -63,6 +63,8 @@ import com.bbn.openmap.proj.coords.LatLonPoint;
  */
 public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 
+	private static final int SNAIL_TIME = 10*60*1000;
+	private static final int ALPHA_STEP = 30;
 	private static final long serialVersionUID = 1L;
 	private OMPoint center;
 	private Temporal currentTime;
@@ -313,12 +315,12 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 				return lines;
 			}
 			int index = positionFixes.indexOf(fix);
-			long time = currentTime.getTime() - 10*60*1000;
+			long time = currentTime.getTime() - SNAIL_TIME;
 			long fixTime = fix.getTemporal().getTime();
 			double lat = currentPoint.getLat();
 			double lon = currentPoint.getLon();
 			int alpha = 255;
-			int alphaStep = 30;
+			int alphaStep = ALPHA_STEP;
 			while (fixTime > time) {
 				OMLine line = new OMLine(lat,
 						lon, fix.getSpatial().getLatitude(),
