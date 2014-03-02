@@ -96,6 +96,12 @@ public class SpatialImpl implements Spatial {
 		this.depth = theDepth;
 	}
 
+	public SpatialImpl(double latitude, double longitude, double depth) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.depth = depth;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

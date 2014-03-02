@@ -33,7 +33,7 @@ import javax.swing.table.TableColumn;
 
 import org.mwc.debrief.lite.AbstractMain;
 import org.mwc.debrief.lite.DebriefMain;
-import org.mwc.debrief.lite.datastore.replay.ReplayDataStore;
+import org.mwc.debrief.lite.datastores.DataStore;
 import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.model.Track;
@@ -72,7 +72,7 @@ public class OpenAction extends AbstractDebriefAction {
 			
 			@Override
 			public boolean accept(File dir, String name) {
-				for (String suffix:ReplayDataStore.SUFFIXES) {
+				for (String suffix:DataStore.SUFFIXES) {
 					if (name.endsWith(suffix)) {
 						return true;
 					}

@@ -21,19 +21,35 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.datastore.gpx;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Properties;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.mwc.debrief.lite.datastores.AbstractDataStore;
 import org.mwc.debrief.lite.datastores.DataStore;
+import org.mwc.debrief.lite.model.PositionFix;
+import org.mwc.debrief.lite.model.Spatial;
+import org.mwc.debrief.lite.model.Temporal;
+import org.mwc.debrief.lite.model.Track;
+import org.mwc.debrief.lite.model.impl.PositionFixImpl;
+import org.mwc.debrief.lite.model.impl.SpatialImpl;
+import org.mwc.debrief.lite.model.impl.TemporalImpl;
+import org.mwc.debrief.lite.model.impl.TrackImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author snpe
@@ -42,7 +58,19 @@ import org.slf4j.LoggerFactory;
 public class GpxDataStore extends AbstractDataStore {
 		
 	static final Logger logger = LoggerFactory.getLogger(GpxDataStore.class);
+	static final DatatypeFactory df;
 	
+	static
+	{
+		try
+		{
+			df = DatatypeFactory.newInstance();
+		}
+		catch (final DatatypeConfigurationException dce)
+		{
+			throw new IllegalStateException("Exception while obtaining DatatypeFactory instance. Can't marshall/unmarshall GPX documents.", dce);
+		}
+	}
 	/**
 	 * @param properties
 	 */
@@ -83,7 +111,7 @@ public class GpxDataStore extends AbstractDataStore {
 						return;
 					}
 					parseFile(is);
-				} catch (FileNotFoundException e) {
+				} catch (Exception e) {
 					valid = false;
 					exceptions.add(e);
 					logger.info("File: {}\n{}", fileName, e);
@@ -103,20 +131,124 @@ public class GpxDataStore extends AbstractDataStore {
 
 	/**
 	 * @param file
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
 	 */
-	private void parseFile(InputStream is) {
-		try (BufferedReader reader = new BufferedReader(
-						new InputStreamReader(is))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				line.trim();
-				//readLine(line);
+	private void parseFile(InputStream is) throws ParserConfigurationException, SAXException, IOException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		factory.setNamespaceAware(true);
+		
+		SAXParser parser = factory.newSAXParser();
+		
+		parser.parse(is, new GPXHandler());
+	}
+	
+	private class GPXHandler extends DefaultHandler {
+		
+		private StringBuilder builder = new StringBuilder();	
+		private Track currentTrack;
+		private String lat, lon, ele, time;
+		private boolean trkpt;
+		
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+		 */
+		@Override
+		public void startElement(String uri, String localName, String qName,
+				Attributes attributes) throws SAXException {
+			builder.setLength(0);
+			if (currentTrack == null) {
+				if ("trk".equals(localName)) {
+					currentTrack = new TrackImpl();
+				}
+			} else {
+				if (!trkpt) {
+					if ("trkpt".equals(localName)) {
+						trkpt = true;
+						lat = attributes.getValue("", "lat");
+						lon = attributes.getValue("", "lon");
+					} else {
+							
+					}
+				}
 			}
-		} catch (Exception e) {
-			logger.info("Reading error:", e);
-			valid = false;
-			exceptions.add(e);
+			
 		}
+
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+		 */
+		@Override
+		public void endElement(String uri, String localName, String qName)
+				throws SAXException {
+			if ("trk".equals(localName)) {
+				tracks.put(currentTrack.getName(), currentTrack);
+				currentTrack = null;
+			} else {
+				if ("trkpt".equals(localName)) {
+					trkpt = false;
+					double latitude = 0;
+					double longitude = 0;
+					double depth = 0;
+					boolean valid = true;
+					try {
+						latitude = new Double(lat);
+					} catch (NumberFormatException e) {
+						logger.warn("Invalid latitude:{}", lat);
+						valid = false;
+					}
+					try {
+						longitude = new Double(lon);
+					} catch (NumberFormatException e) {
+						logger.warn("Invalid longitude:{}", lon);
+						valid = false;
+					}
+					try {
+						depth = new Double(ele);
+					} catch (NumberFormatException e) {
+						logger.warn("Invalid depth:{}", ele);
+						valid = false;
+					}
+					Temporal temporal;
+					try {
+						XMLGregorianCalendar date = df.newXMLGregorianCalendar(time);
+						date.setFractionalSecond(null);
+						date = date.normalize();
+						temporal = new TemporalImpl(date.toGregorianCalendar().getTime());
+					} catch (Exception e) {
+						temporal = new TemporalImpl();
+					}
+					if (valid) {
+						Spatial spatial = new SpatialImpl(latitude, longitude, depth);
+						PositionFix fix = new PositionFixImpl(currentTrack.getName(), temporal, spatial, 0, 0, "D");
+						currentTrack.getPositionFixes().add(fix);
+					}
+				}
+				if ("name".equals(localName) && currentTrack != null) {
+					String name = builder.toString();
+					currentTrack.setName(name);
+				}
+				if (trkpt) {
+					if ("ele".equals(localName)) {
+						ele = builder.toString();
+					}
+					if ("time".equals(localName)) {
+						time = builder.toString();
+					}
+				}
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+		 */
+		@Override
+		public void characters(char[] ch, int start, int length)
+				throws SAXException {
+			builder.append(ch, start, length);
+		}
+		
 	}
 
 }

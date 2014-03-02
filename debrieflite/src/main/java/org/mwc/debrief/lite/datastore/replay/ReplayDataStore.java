@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 public class ReplayDataStore extends AbstractDataStore {
 
 	private static final String COMMENT_PREFIX = ";;";
-	public static final String[] SUFFIXES = new String[]{ ".rep", ".dsf", ".dtf" };
 			
 	static final Logger logger = LoggerFactory.getLogger(ReplayDataStore.class);
 	

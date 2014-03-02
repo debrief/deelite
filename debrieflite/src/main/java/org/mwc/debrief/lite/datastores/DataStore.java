@@ -40,6 +40,7 @@ public interface DataStore {
 	public static String GPX_TYPE = "gpx";
 	public static String TYPE = "type";
 	public static String FILENAME = "fileName";
+	public static final String[] SUFFIXES = new String[]{ ".rep", ".dsf", ".dtf" , ".gpx"};
 	
 	Map<String,Narrative> getNarratives();
 	List<NarrativeEntry> getNarrativeEntries();

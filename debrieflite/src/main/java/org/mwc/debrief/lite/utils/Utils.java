@@ -79,10 +79,10 @@ public class Utils {
 		if (tracks == null || tracks.size() <= 0) {
         	return map.getMapBean().getScale();
         }
-		double minLat = 90f;
-		double maxLat = -90f;
-		double minLon = 90f;
-		double maxLon = -90f;
+		double minLat = 180f;
+		double maxLat = -180f;
+		double minLon = 180f;
+		double maxLon = -180f;
 		boolean changeProjection = false;
 		List<PositionFix> positionFixes = new ArrayList<PositionFix>();
 		for (Track track : tracks.values()) {
@@ -154,7 +154,12 @@ public class Utils {
 	public static TrackLayer createTrackLayer(String fileName, OverlayMapPanel map) {
 		 
         Properties props = new Properties();
-        props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
+        if (fileName.endsWith(".gpx")) {
+        	props.put(DataStore.TYPE, DataStore.GPX_TYPE);
+        } else {
+        	// FIXME
+        	props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
+        }
         props.put(DataStore.FILENAME, fileName);
 		dataStore = DataStoreFactory.getDataStore(props);
 		
