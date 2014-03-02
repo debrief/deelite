@@ -26,6 +26,8 @@ import java.awt.Toolkit;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,23 +35,26 @@ import java.util.TimeZone;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
 
+import org.mwc.debrief.lite.AbstractMain;
 import org.mwc.debrief.lite.DebriefMain;
 import org.mwc.debrief.lite.actions.AbstractDebriefAction;
 import org.mwc.debrief.lite.datastores.DataStore;
 import org.mwc.debrief.lite.datastores.DataStoreFactory;
 import org.mwc.debrief.lite.layers.TrackLayer;
+import org.mwc.debrief.lite.model.NarrativeEntry;
 import org.mwc.debrief.lite.model.PositionFix;
 import org.mwc.debrief.lite.model.Temporal;
 import org.mwc.debrief.lite.model.Track;
 import org.mwc.debrief.lite.time.TimeEvent;
+import org.mwc.debrief.lite.views.NarrativeTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bbn.openmap.Environment;
 import com.bbn.openmap.gui.EmbeddedNavPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
-import com.bbn.openmap.omGraphics.OMPoint;
 
 /**
  * @author snpe
@@ -71,11 +76,10 @@ public class Utils {
 	 * 
 	 */
 	public static double configureTracks(OverlayMapPanel map,
-			TrackLayer trackLayer) {
-		if (trackLayer ==null || map == null) {
-			return map.getMapBean().getScale();
+			Map<String, Track> tracks) {
+		if ( map == null) {
+			return Environment.getDouble(Environment.Scale);
 		}
-		Map<String, Track> tracks = trackLayer.getTracks();
 		if (tracks == null || tracks.size() <= 0) {
         	return map.getMapBean().getScale();
         }
@@ -132,8 +136,9 @@ public class Utils {
 				EmbeddedNavPanel navPanel = (EmbeddedNavPanel) object;
 				navPanel.setRecenterPoint(map.getMapBean().getCenter());
 			}
-			OMPoint center = new OMPoint(lat, lon, 3);
-			trackLayer.setCenter(center);
+			//OMPoint center = new OMPoint(lat, lon, 3);
+			//trackLayer.setCenter(center);
+			
 			Environment.set(Environment.Scale, Float.toString(scale));
 			return scale;
 		}
@@ -144,14 +149,17 @@ public class Utils {
 	 * @param map
 	 */
 	public static void removeTrackLayer(OverlayMapPanel map) {
-		TrackLayer trackLayer = (TrackLayer) map.getMapComponentByType(TrackLayer.class);
-		if (trackLayer != null) {
-			DebriefMain.getTimeController().removeTimeListener(trackLayer);
-			map.removeMapComponent(trackLayer);
+		@SuppressWarnings("unchecked")
+		Collection<TrackLayer> trackLayers = (Collection<TrackLayer>) map.getMapComponentsByType(TrackLayer.class);
+		for (TrackLayer trackLayer:trackLayers) {
+			if (trackLayer != null) {
+				DebriefMain.getTimeController().removeTimeListener(trackLayer);
+				map.removeMapComponent(trackLayer);
+			}
 		}
 	}
 
-	public static TrackLayer createTrackLayer(String fileName, OverlayMapPanel map) {
+	public static List<TrackLayer> createTrackLayer(String fileName, OverlayMapPanel map) {
 		 
         Properties props = new Properties();
         if (fileName.endsWith(".gpx")) {
@@ -177,14 +185,20 @@ public class Utils {
         	JOptionPane.showMessageDialog(DebriefMain.mainFrame, message);
         	return null;
         }
-        TrackLayer trackLayer = new TrackLayer();
-        trackLayer.setTracks(tracks);
-        double scale = Utils.configureTracks(map, trackLayer);
+        List<TrackLayer> trackLayers = new ArrayList<TrackLayer>();
+        for (Track track:tracks.values()) {
+        	TrackLayer trackLayer = new TrackLayer();
+        	Map<String, Track> maps = new HashMap<String, Track>();
+        	maps.put(track.getName(), track);
+        	trackLayer.setTracks(maps);
+        	trackLayers.add(trackLayer);
+        }
+        double scale = Utils.configureTracks(map, tracks);
         DebriefMain.setActionEnabled(true);
         DebriefMain.fitToWindow.setScale(scale);
         DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
         DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
-        return trackLayer;
+        return trackLayers;
 	}
 
 	public static DataStore getCurrentDataStore() {
@@ -212,6 +226,51 @@ public class Utils {
 			DebriefMain.getTimeController().notifyListeners(new TimeEvent(currentTime.getTime(), object));
 		} else {
 			DebriefMain.getTimeController().notifyListeners(new TimeEvent(0l, object));
+		}
+	}
+	
+	/**
+	 * @param fileName
+	 */
+	public static void addTrackLayers(String fileName) {
+		OverlayMapPanel map = DebriefMain.getMap();
+		DebriefMain.setTimeViewEnabled(false);
+		List<TrackLayer> trackLayers = Utils.createTrackLayer(fileName, map);
+		if (trackLayers != null) {
+			Utils.removeTrackLayer(map);
+			for (TrackLayer trackLayer:trackLayers) {
+				map.addMapComponent(trackLayer);
+			}
+			if (trackLayers.size() > 0) {
+				DebriefMain.setTimeViewEnabled(true);
+			}
+		}
+		List<NarrativeEntry> narrativeEntries = null;
+		if (Utils.getCurrentDataStore() != null) {
+			narrativeEntries = Utils.getCurrentDataStore().getNarrativeEntries();
+		}
+		NarrativeTableModel tableModel = new NarrativeTableModel(narrativeEntries);
+		AbstractMain.narrativeTable.setModel(tableModel);
+		for (int i = 0; i < NarrativeTableModel.COLUMN_COUNT; i++) {
+        	TableColumn column = AbstractMain.narrativeTable.getColumnModel().getColumn(i);
+        	switch (i) {
+			case 0:
+				column.setMinWidth(100);
+		        column.setPreferredWidth(120);	
+				break;
+			case 1:
+			case 2:
+		        column.setMinWidth(80);
+		        column.setPreferredWidth(100);	
+				break;
+			case 3:
+		        column.setMinWidth(100);
+		        column.setPreferredWidth(200);
+				break;
+			default:
+				break;
+			}
+			
 		}
 	}
 }

@@ -75,7 +75,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	private boolean snailMode;
 	
 	public TrackLayer() {
-		setName("Tracks");
+		setName("Track");
 		setProjectionChangePolicy(new StandardPCPolicy(
 				this, true));
 		BufferedImageRenderPolicy policy = new BufferedImageRenderPolicy();
@@ -200,7 +200,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		this.tracks = tracks;
 		if (tracks != null && tracks.size() > 0) {
 			StringBuilder builder = new StringBuilder();
-			builder.append("Tracks (");
+			builder.append("Track (");
 			Iterator<String> iterator = tracks.keySet().iterator();
 			while (iterator.hasNext()) {
 				builder.append(iterator.next());
@@ -246,7 +246,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 			} else if (endTime.getTime() < newTime) {
 				newTime = endTime.getTime();
 			}
-			if (newTime == currentTime.getTime()) {
+			if (currentTime != null && newTime == currentTime.getTime()) {
 				return;
 			}
 			currentTime = new TemporalImpl(newTime);
@@ -309,7 +309,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		}
 		OMPoint currentPoint = info.getCurrentPoint();
 		PositionFix fix = info.getStartFix() == null ? info.getEndFix() : info.getStartFix();
-		if (fix != null && fix.getTemporal() != null) {
+		if (fix != null && fix.getTemporal() != null && currentPoint != null) {
 			List<PositionFix> positionFixes = track.getPositionFixes();
 			if (positionFixes == null) {
 				return lines;

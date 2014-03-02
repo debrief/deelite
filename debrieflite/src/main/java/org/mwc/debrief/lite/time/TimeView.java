@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -98,9 +99,12 @@ public class TimeView extends JPanel implements TimeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setSnailMode(!snailMode);
-				TrackLayer trackLayer = (TrackLayer) AbstractMain.getMap().getMapComponentByType(TrackLayer.class);
-				if (trackLayer != null) {
-					trackLayer.setSnailMode(snailMode);
+				@SuppressWarnings("unchecked")
+				Collection<TrackLayer> trackLayers = (Collection<TrackLayer>) AbstractMain.getMap().getMapComponentsByType(TrackLayer.class);
+				if (trackLayers != null) {
+					for (TrackLayer trackLayer:trackLayers) {
+						trackLayer.setSnailMode(snailMode);
+					}
 				}
 			}
 		});

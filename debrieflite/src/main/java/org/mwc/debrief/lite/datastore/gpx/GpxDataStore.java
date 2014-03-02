@@ -26,6 +26,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -184,6 +188,32 @@ public class GpxDataStore extends AbstractDataStore {
 				throws SAXException {
 			if ("trk".equals(localName)) {
 				tracks.put(currentTrack.getName(), currentTrack);
+				List<PositionFix> fixes = new ArrayList<PositionFix>();
+				fixes.addAll(currentTrack.getPositionFixes());
+				Collections.sort(fixes, new Comparator<PositionFix>() {
+
+					/* (non-Javadoc)
+					 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+					 */
+					@Override
+					public int compare(PositionFix o1, PositionFix o2) {
+						if (o1 == o2) {
+							return 0;
+						}
+						if (o1 == null || o1.getTemporal() == null) {
+							return 1;
+						}
+						if (o2 == null || o2.getTemporal() == null) {
+							return -1;
+						}
+						return o1.getTemporal().compareTo(o2.getTemporal());
+					}
+					
+				});
+				currentTrack.getPositionFixes().clear();
+				for (PositionFix fix:fixes) {
+					currentTrack.getPositionFixes().add(fix);
+				}
 				currentTrack = null;
 			} else {
 				if ("trkpt".equals(localName)) {

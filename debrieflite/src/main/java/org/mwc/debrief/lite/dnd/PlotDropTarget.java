@@ -27,6 +27,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -69,19 +70,14 @@ public class PlotDropTarget extends DropTarget {
             if (droppedFiles != null && droppedFiles.size() > 0) {
             	File file = droppedFiles.get(0);
             	// FIXME check extensions
-            	TrackLayer oldLayer = (TrackLayer) map.getMapComponentByType(TrackLayer.class);
-        		boolean replace = oldLayer == null;
+            	Collection<?> oldLayers = map.getMapComponentsByType(TrackLayer.class);
+        		boolean replace = oldLayers == null || oldLayers.size() > 0;
         		if (!replace) {
         			int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, "Are you sure you want to replace the current plot with '" + file.getName() + "'?", "Close plot", JOptionPane.OK_CANCEL_OPTION);
         			replace = (ok == JOptionPane.OK_OPTION);
         		}
 				if (replace) {
-					TrackLayer trackLayer = Utils.createTrackLayer(
-							file.getAbsolutePath(), map);
-					if (trackLayer != null) {
-						Utils.removeTrackLayer(map);
-						map.addMapComponent(trackLayer);
-					}
+					Utils.addTrackLayers(file.getAbsolutePath());
 				}
             }
         } catch (Exception ex) {
