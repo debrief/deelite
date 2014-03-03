@@ -21,16 +21,6 @@
  *******************************************************************************/
 package org.mwc.debrief.lite.layers;
 
-import java.awt.RenderingHints;
-import java.awt.RenderingHints.Key;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mwc.debrief.lite.DebriefMain;
-
-import com.bbn.openmap.layer.policy.BufferedImageRenderPolicy;
-import com.bbn.openmap.layer.policy.StandardPCPolicy;
 import com.bbn.openmap.layer.shape.ShapeLayer;
 
 /**
@@ -44,13 +34,13 @@ public class CoastlineLayer extends ShapeLayer {
 	public CoastlineLayer(String fileName) {
 		super(fileName);
 		setName("Coastline");
-		setProjectionChangePolicy(new StandardPCPolicy(
-				this, true));
-		BufferedImageRenderPolicy policy = new BufferedImageRenderPolicy();
-		Map<Key, Object> map = new HashMap<RenderingHints.Key, Object>();
-		map.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
-		RenderingHints rh = new RenderingHints(map);
-		policy.setRenderingHints(rh);
-		setRenderPolicy(policy);
+//		setProjectionChangePolicy(new StandardPCPolicy(
+//				this, true));
+//		BufferedImageRenderPolicy policy = new BufferedImageRenderPolicy();
+//		Map<Key, Object> map = new HashMap<RenderingHints.Key, Object>();
+//		map.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
+//		RenderingHints rh = new RenderingHints(map);
+//		policy.setRenderingHints(rh);
+//		setRenderPolicy(policy);
 	}
 }
