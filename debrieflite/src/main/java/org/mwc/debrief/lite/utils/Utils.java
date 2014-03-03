@@ -22,7 +22,6 @@
 package org.mwc.debrief.lite.utils;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import com.bbn.openmap.Environment;
 import com.bbn.openmap.gui.EmbeddedNavPanel;
 import com.bbn.openmap.gui.OverlayMapPanel;
+import com.bbn.openmap.proj.Length;
 
 /**
  * @author snpe
@@ -75,21 +75,27 @@ public class Utils {
 	 * @param trackLayer
 	 * 
 	 */
-	public static double configureTracks(OverlayMapPanel map,
-			Map<String, Track> tracks) {
+	public static double configureTracks() {
+		OverlayMapPanel map = DebriefMain.getMap();
 		if ( map == null) {
 			return Environment.getDouble(Environment.Scale);
+		}
+		List<Track> tracks = new ArrayList<Track>();
+		@SuppressWarnings("unchecked")
+		Collection<TrackLayer> trackLayers = (Collection<TrackLayer>) map.getMapComponentsByType(TrackLayer.class);
+		for (TrackLayer trackLayer:trackLayers) {
+			tracks.addAll(trackLayer.getTracks().values());
 		}
 		if (tracks == null || tracks.size() <= 0) {
         	return map.getMapBean().getScale();
         }
-		double minLat = 180f;
-		double maxLat = -180f;
+		double minLat = 90f;
+		double maxLat = -90f;
 		double minLon = 180f;
 		double maxLon = -180f;
 		boolean changeProjection = false;
 		List<PositionFix> positionFixes = new ArrayList<PositionFix>();
-		for (Track track : tracks.values()) {
+		for (Track track : tracks) {
 			positionFixes.addAll(track.getPositionFixes());
 		}
 		if (positionFixes.size() <= 0) {
@@ -112,34 +118,32 @@ public class Utils {
 		}
 
 		if (changeProjection) {
+			Dimension size = DebriefMain.getPlotPanel().getSize();
+			double width = size.getWidth();
+			
 			double lon = maxLon - (maxLon - minLon)/2;
 			double lat = maxLat - (maxLat - minLat)/2;
 			double length = maxLon - minLon;
 			if ( (maxLat-minLat) > length) {
 				length = maxLat - minLat;
 			}
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			int width = (int) screenSize.getWidth();
-			//int height = (int) screenSize.getHeight();
-			float scale = (float) (length*width*1000f)/2.1f;
-			
-//			Projection p = new Mercator(new LatLonPoint.Double(lat, lon),
-//					scale, width, height);
-//			MapBean mapBean = map.getMapBean();
-//			mapBean.setProjection(p);
-			
+			double km = Length.KM.fromRadians(length);			
+			float scale = (float) (km*100000/width);
 			map.getMapBean().setScale((float) scale);
 			DebriefMain.getCenterSupport().fireCenter(lat, lon);
-			
 			Object object = map.getMapHandler().get(EmbeddedNavPanel.class);
 			if (object instanceof EmbeddedNavPanel) {
 				EmbeddedNavPanel navPanel = (EmbeddedNavPanel) object;
 				navPanel.setRecenterPoint(map.getMapBean().getCenter());
 			}
-			//OMPoint center = new OMPoint(lat, lon, 3);
-			//trackLayer.setCenter(center);
 			
 			Environment.set(Environment.Scale, Float.toString(scale));
+			
+			DebriefMain.setActionEnabled(true);
+	        DebriefMain.fitToWindow.setScale(scale);
+	        DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
+	        DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
+	        
 			return scale;
 		}
 		return Environment.getDouble(Environment.Scale);
@@ -165,7 +169,6 @@ public class Utils {
         if (fileName.endsWith(".gpx")) {
         	props.put(DataStore.TYPE, DataStore.GPX_TYPE);
         } else {
-        	// FIXME
         	props.put(DataStore.TYPE, DataStore.REPLAY_TYPE);
         }
         props.put(DataStore.FILENAME, fileName);
@@ -193,11 +196,6 @@ public class Utils {
         	trackLayer.setTracks(maps);
         	trackLayers.add(trackLayer);
         }
-        double scale = Utils.configureTracks(map, tracks);
-        DebriefMain.setActionEnabled(true);
-        DebriefMain.fitToWindow.setScale(scale);
-        DebriefMain.fitToWindow.setLatitude(map.getMapBean().getCenter().getY());
-        DebriefMain.fitToWindow.setLongitude(map.getMapBean().getCenter().getX());
         return trackLayers;
 	}
 
@@ -237,13 +235,13 @@ public class Utils {
 		DebriefMain.setTimeViewEnabled(false);
 		List<TrackLayer> trackLayers = Utils.createTrackLayer(fileName, map);
 		if (trackLayers != null) {
-			Utils.removeTrackLayer(map);
 			for (TrackLayer trackLayer:trackLayers) {
 				map.addMapComponent(trackLayer);
 			}
 			if (trackLayers.size() > 0) {
 				DebriefMain.setTimeViewEnabled(true);
 			}
+			Utils.configureTracks();
 		}
 		List<NarrativeEntry> narrativeEntries = null;
 		if (Utils.getCurrentDataStore() != null) {

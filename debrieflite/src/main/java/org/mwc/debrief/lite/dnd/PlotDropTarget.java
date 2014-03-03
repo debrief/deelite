@@ -68,17 +68,21 @@ public class PlotDropTarget extends DropTarget {
             		getTransferData(DataFlavor.javaFileListFlavor);
             // we select only first file
             if (droppedFiles != null && droppedFiles.size() > 0) {
-            	File file = droppedFiles.get(0);
             	// FIXME check extensions
             	Collection<?> oldLayers = map.getMapComponentsByType(TrackLayer.class);
-        		boolean replace = oldLayers == null || oldLayers.size() > 0;
+        		boolean replace = oldLayers == null || oldLayers.size() <= 0;
         		if (!replace) {
-        			int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, "Are you sure you want to replace the current plot with '" + file.getName() + "'?", "Close plot", JOptionPane.OK_CANCEL_OPTION);
+        			int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, 
+        					"Do you want to replace the current plot(s)?", "Drop plot", 
+        					JOptionPane.YES_NO_OPTION);
         			replace = (ok == JOptionPane.OK_OPTION);
         		}
-				if (replace) {
-					Utils.addTrackLayers(file.getAbsolutePath());
-				}
+        		if (replace) {
+    				Utils.removeTrackLayer(map);
+    			}
+        		for (File file:droppedFiles) {
+    				Utils.addTrackLayers(file.getAbsolutePath());
+    			}
             }
         } catch (Exception ex) {
             ex.printStackTrace();

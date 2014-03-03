@@ -96,20 +96,20 @@ public abstract class AbstractMain extends OpenMapFrame {
 	
 	protected ZoomSupport zoomSupport;
 	
-	protected JPanel mainPanel;
-	protected JPanel plotPanel;
-	protected JPanel leftPanel;
-	protected JPanel topPanel;
-	protected JPanel bottomPanel;
-	protected JSplitPane mainSplitPane;
-	protected JSplitPane leftSplitPane;
-	protected JPanel timePanel;
-	public JPanel narrativePanel;
-	protected JPanel layersPanel;
+	protected static JPanel mainPanel;
+	protected static JPanel plotPanel;
+	protected static JPanel leftPanel;
+	protected static JPanel topPanel;
+	protected static JPanel bottomPanel;
+	protected static JSplitPane mainSplitPane;
+	protected static JSplitPane leftSplitPane;
+	protected static JPanel timePanel;
+	public static JPanel narrativePanel;
+	protected static JPanel layersPanel;
 	
 	protected List<Action> actions;
 
-	protected MapBean mapBean;
+	protected static MapBean mapBean;
 	protected static OverlayMapPanel map;
 	protected String lookAndFeel;
 	protected ButtonGroup lookAndFeelRadioGroup;
@@ -231,6 +231,13 @@ public abstract class AbstractMain extends OpenMapFrame {
 		bottomPanel.add(bottomTabbedPane);
 		
 		createNarrativeTable(narrativePanel);
+	}
+
+	/**
+	 * @return the plotPanel
+	 */
+	public static JPanel getPlotPanel() {
+		return plotPanel;
 	}
 
 	private void createTimePanel(JTabbedPane topTabbedPane) {

@@ -62,6 +62,7 @@ public class CloseAction extends AbstractAction {
 		}
 		int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, "Are you sure you want to close the current plot?", "Close plot", JOptionPane.OK_CANCEL_OPTION);
 		if (ok == JOptionPane.OK_OPTION) {
+			DebriefMain.panAction.actionPerformed(null);
 			Utils.removeTrackLayer(map);
 			DebriefMain.setActionEnabled(false);
 			DebriefMain.setTimeViewEnabled(false);

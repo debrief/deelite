@@ -25,11 +25,14 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Collection;
 
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import org.mwc.debrief.lite.DebriefMain;
 import org.mwc.debrief.lite.datastores.DataStore;
+import org.mwc.debrief.lite.layers.TrackLayer;
 import org.mwc.debrief.lite.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +80,20 @@ public class OpenAction extends AbstractDebriefAction {
 		if (files == null || files.length <= 0) {
 			return;
 		}
-		String fileName = files[0].getAbsolutePath();
-		Utils.addTrackLayers(fileName);
+		Collection<?> oldLayers = map.getMapComponentsByType(TrackLayer.class);
+		boolean replace = oldLayers == null || oldLayers.size() <= 0;
+		if (!replace) {
+			int ok = JOptionPane.showConfirmDialog(DebriefMain.mainFrame, 
+					"Do you want to replace the current plot(s)?", "Open plot", 
+					JOptionPane.YES_NO_OPTION);
+			replace = (ok == JOptionPane.OK_OPTION);
+		}
+		if (replace) {
+			Utils.removeTrackLayer(map);
+		}
+		for (File file:files) {
+			Utils.addTrackLayers(file.getAbsolutePath());
+		}
         
 	}
 

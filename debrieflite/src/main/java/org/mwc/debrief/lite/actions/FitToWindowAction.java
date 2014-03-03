@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import org.mwc.debrief.lite.DebriefMain;
+import org.mwc.debrief.lite.utils.Utils;
 
 import com.bbn.openmap.gui.OverlayMapPanel;
 
@@ -44,6 +45,7 @@ public class FitToWindowAction extends AbstractDebriefAction {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		Utils.configureTracks();
 		if (map != null && scale != 0) {
 			map.getMapBean().setScale((float) scale);
 			DebriefMain.getCenterSupport().fireCenter(latitude, longitude);

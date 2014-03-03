@@ -287,6 +287,7 @@ public class TimeView extends JPanel implements TimeListener {
 		}
 		playing = false;
 		changing = false;
+		setSnailMode(false);
 		setPlayButton();
 	}
 
@@ -345,22 +346,31 @@ public class TimeView extends JPanel implements TimeListener {
 	}
 
 	private void updateTrackLayer() {
-		TrackLayer trackLayer = (TrackLayer) AbstractMain.getMap().getMapComponentByType(TrackLayer.class);
+		@SuppressWarnings("unchecked")
+		Collection<TrackLayer> trackLayers = (Collection<TrackLayer>) AbstractMain.getMap().getMapComponentsByType(TrackLayer.class);
 		timeScale = 0;
 		String text = EMPTY_LABEL;
-		if (trackLayer != null) {
-			currentTime = trackLayer.getCurrentTime();
-			startTime = trackLayer.getStartTime();
-			endTime = trackLayer.getEndTime();
-			if (startTime != null && endTime != null) {
-				timeScale = endTime.getTime() - startTime.getTime();
-				if (timeScale < 0) {
-					timeScale = 0;
+		for (TrackLayer trackLayer:trackLayers) {
+			if (trackLayer != null) {
+				if (startTime == null || startTime.compareTo(trackLayer.getStartTime()) > 0) {
+					startTime = trackLayer.getStartTime();
+				}
+				if (endTime == null || endTime.compareTo(trackLayer.getStartTime()) < 0) {
+					endTime = trackLayer.getEndTime();
 				}
 			}
-			if (timeScale > 0 && currentTime != null && currentTime.getTime() > 0) {
-				text = Utils.getDefaultDateFormat().format(currentTime.getDate());
+		}
+		currentTime = startTime;
+		setCurrentTime();
+		DebriefMain.getTimeController().notifyListeners(new TimeEvent(currentTime.getTime(), TimeView.this));
+		if (startTime != null && endTime != null) {
+			timeScale = endTime.getTime() - startTime.getTime();
+			if (timeScale < 0) {
+				timeScale = 0;
 			}
+		}
+		if (timeScale > 0 && currentTime != null && currentTime.getTime() > 0) {
+			text = Utils.getDefaultDateFormat().format(currentTime.getDate());
 		}
 		textLabel.setText(text);
 		slider.setValue(0);
