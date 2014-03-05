@@ -173,7 +173,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	
 	private DebriefPoint getPoint(PositionFix positionFix) {
 		DebriefPoint point = new DebriefPoint(positionFix, 6);
-		point.setLinePaint(Color.white);
+		point.setLinePaint(getForeground());
 		point.setOval(false);
 		point.putAttribute(OMGraphicConstants.LABEL, new OMTextLabeler(positionFix.getName()));
 		return point;
