@@ -427,7 +427,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 	 */
 	private OMPoint getPoint(LatLonPoint llp, String name) {
 		OMPoint point = new OMPoint(llp.getLatitude(), llp.getLongitude(), 6);
-		point.setLinePaint(Color.white);
+		point.setLinePaint(getForeground());
 		point.setOval(false);
 		if (name != null) {
 			point.putAttribute(OMGraphicConstants.LABEL, new OMTextLabeler(name));
