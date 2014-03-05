@@ -34,13 +34,5 @@ public class CoastlineLayer extends ShapeLayer {
 	public CoastlineLayer(String fileName) {
 		super(fileName);
 		setName("Coastline");
-//		setProjectionChangePolicy(new StandardPCPolicy(
-//				this, true));
-//		BufferedImageRenderPolicy policy = new BufferedImageRenderPolicy();
-//		Map<Key, Object> map = new HashMap<RenderingHints.Key, Object>();
-//		map.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
-//		RenderingHints rh = new RenderingHints(map);
-//		policy.setRenderingHints(rh);
-//		setRenderPolicy(policy);
 	}
 }

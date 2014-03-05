@@ -139,9 +139,7 @@ public class DebriefMain extends AbstractMain {
 		map.addMapComponent(rangeBearingLayer);
 
 		// coastline layer
-		File userHome = new File(System.getProperty("user.home"));
-		File debriefHome = new File(userHome, ".debrieflite");
-		File coastlineHome = new File(debriefHome, "coastline");
+		File coastlineHome = new File("coastline");
 		File shpFile = new File(coastlineHome, "ne_10m_land.shp");
 		if (shpFile.exists()) {
 			CoastlineLayer coastlineLayer = new CoastlineLayer(shpFile.getAbsolutePath());
