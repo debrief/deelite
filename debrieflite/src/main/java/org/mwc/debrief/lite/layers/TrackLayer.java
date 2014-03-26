@@ -44,6 +44,7 @@ import org.mwc.debrief.lite.time.TimeListener;
 import org.mwc.debrief.lite.utils.ReadingUtility;
 import org.mwc.debrief.lite.utils.Utils;
 
+import com.bbn.openmap.event.OMMouseMode;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.layer.policy.BufferedImageRenderPolicy;
 import com.bbn.openmap.layer.policy.StandardPCPolicy;
@@ -84,6 +85,8 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		RenderingHints rh = new RenderingHints(map);
 		policy.setRenderingHints(rh);
 		setRenderPolicy(policy);
+		setMouseModeIDsForEvents(new String[] { OMMouseMode.modeID} );
+		//getMouseEventInterpreter();
 		DebriefMain.getTimeController().addTimeListener(this);
 	}
 
@@ -164,6 +167,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 				String symbology = positionFix.getSymbology();
 				line.setLinePaint(ReadingUtility.getSymbologyColor(symbology));
 				line.setStroke(new BasicStroke(2));
+				line.setSelectPaint(line.getLinePaint());
 				trackList.add(line);
 			} 
 			latest = point;
@@ -326,6 +330,7 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 						lon, fix.getSpatial().getLatitude(),
 						fix.getSpatial().getLongitude(),
 						OMGraphic.LINETYPE_GREATCIRCLE);
+				line.setAppObject(fix);
 				String symbology = fix.getSymbology();
 				Color color = ReadingUtility.getSymbologyColor(symbology);
 				if (alpha != 255) {
@@ -472,4 +477,88 @@ public class TrackLayer extends OMGraphicHandlerLayer implements TimeListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.bbn.openmap.layer.OMGraphicHandlerLayer#highlight(com.bbn.openmap.omGraphics.OMGraphic)
+	 */
+	@Override
+	public void highlight(OMGraphic omg) {
+		if (omg instanceof DebriefLine) {
+			omg.setStroke(new BasicStroke(6));
+		}
+		super.highlight(omg);
+		doPrepare();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.bbn.openmap.layer.OMGraphicHandlerLayer#unhighlight(com.bbn.openmap.omGraphics.OMGraphic)
+	 */
+	@Override
+	public void unhighlight(OMGraphic omg) {
+		if (omg instanceof DebriefLine) {
+			omg.setStroke(new BasicStroke(2));
+		}
+		super.unhighlight(omg);
+		doPrepare();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.bbn.openmap.layer.OMGraphicHandlerLayer#getToolTipTextFor(com.bbn.openmap.omGraphics.OMGraphic)
+	 */
+	@Override
+	public String getToolTipTextFor(OMGraphic omg) {
+		PositionFix fix = getPositionFix(omg);
+		if (fix != null) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("<html>");
+			builder.append("<center><h5>");
+			builder.append(fix.getName());
+			builder.append("</h5></center>");
+			// builder.append("<br/>");
+			builder.append("Crse:");
+			builder.append(String.format("%5.2f", fix.getCourse()));
+			builder.append(" Spd:");
+			builder.append(String.format("%5.2f", fix.getSpeed()));
+			if (fix.getSpatial() != null) {
+				builder.append(" Depth:");
+				builder.append(String.format("%5.2f", fix.getSpatial()
+						.getDepth()));
+			}
+			builder.append("<br/>");
+			builder.append("Time:");
+			builder.append(Utils.getDefaultDateFormat().format(
+					fix.getTemporal().getDate()));
+			builder.append("</html>");
+			return builder.toString();
+		}
+		return super.getToolTipTextFor(omg);
+	}
+
+	/**
+	 * @param omg
+	 * @return
+	 */
+	private PositionFix getPositionFix(OMGraphic omg) {
+		if (omg instanceof DebriefLine) {
+			DebriefLine line = (DebriefLine) omg;
+			DebriefPoint startPoint = line.getStartPoint();
+			if (startPoint != null) {
+				return startPoint.getPositionFix();
+			}
+		} else if (omg instanceof OMLine) {
+			Object object = omg.getAppObject();
+			if (object instanceof PositionFix) {
+				return (PositionFix) object;
+			}
+		}
+		return null;
+	}
+
+	/**
+     * Query that an OMGraphic can be highlighted when the mouse moves over it.
+     * If the answer is true, then highlight with this OMGraphics will be
+     * called.
+     */
+    public boolean isHighlightable(OMGraphic omg) {
+        return true;
+    }
 }
