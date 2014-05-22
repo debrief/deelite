@@ -7,4 +7,4 @@ Whilst the full (Debrief)[www.debrief.info] application brings a full workbench 
 * pan/zoom around tracks
 * replay of narrative data
 
-The DeeLite application is small to download, with few dependencies.
+The compiled DeeLite application is small to download (favouring deployed units), with few dependencies.
