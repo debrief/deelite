@@ -1,4 +1,10 @@
 deelite
 =======
 
-Quick-look maritime analysis tool
+Whilst the full (Debrief)[www.debrief.info] application brings a full workbench of tools to analysts, the DeeLite application has been created for ad-hoc analysis/replay tasks for casual users.   There's a much more shallow learning curve, witin a user interface that is focussed on a smaller capability set:
+
+* replay tracks
+* pan/zoom around tracks
+* replay of narrative data
+
+The DeeLite application is small to download, with few dependencies.
