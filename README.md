@@ -10,4 +10,4 @@ Whilst the full [Debrief] application brings a full workbench of tools to analys
 The compiled DeeLite application is small to download (favouring deployed units), with few dependencies.
 
 
-[Debrief]:www.debrief.info
+[Debrief]:http://www.debrief.info
